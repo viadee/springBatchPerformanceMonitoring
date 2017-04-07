@@ -10,4 +10,4 @@ It measures the performance of Job, Step, Chunk, Reader/Processor/Writer/Tasklet
 1. Add the sbpm-jar to your classpath (maven-repository to follow).
 2. Add the de.viadee.spring.batch.infrastructure.Configurator.class to your Spring-Application-Context (via @Import on your Configuration) 
 3. Run the Job
-4. By default the monitoring result ist written to project-folder/target/database/monitoringDB.mv.db
+4. By default the monitoring result is written to project-folder/target/database/monitoringDB.mv.db
