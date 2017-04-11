@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.viadee</groupId>
 	<artifactId>springBatchPerformanceMonitoring</artifactId>
-	<name>Spring Batch Performance Monitoring</name>
+	<name>Spring Batch Performance Monitoring (SBPM)</name>
 	<inceptionYear>2016</inceptionYear>
 	<organization>
 		<name>viadee Unternehmensberatung GmbH</name>
