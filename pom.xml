@@ -6,31 +6,31 @@
 	<name>Spring Batch Performance Monitoring (SBPM)</name>
 	<inceptionYear>2016</inceptionYear>
 	<licenses>
-        <license>
-            <name>FreeBSD License</name>
-            <url>https://opensource.org/licenses/bsd-license.php</url>
-        </license>
-    </licenses>
-    
-    <scm>
-        <connection>scm:git:git@github.com:viadee/springBatchPerformanceMonitoring.git</connection>
-        <developerConnection>scm:git:git@github.com:viadee/springBatchPerformanceMonitoring.git</developerConnection>
-        <url>git@github.com:viadee/springBatchPerformanceMonitoring.git</url>
-    </scm>
-	
+		<license>
+			<name>FreeBSD License</name>
+			<url>https://opensource.org/licenses/bsd-license.php</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:viadee/springBatchPerformanceMonitoring.git</connection>
+		<developerConnection>scm:git:git@github.com:viadee/springBatchPerformanceMonitoring.git</developerConnection>
+		<url>git@github.com:viadee/springBatchPerformanceMonitoring.git</url>
+	</scm>
+
 	<organization>
 		<name>viadee Unternehmensberatung GmbH</name>
 		<url>http://www.viadee.de</url>
 	</organization>
-	
+
 	<developers>
-        <developer>
-            <name>Christian Nockemann</name>
-            <email>christian.nockemann@viadee.de</email>
-            <organization>viadee Unternehmensberatung GmbH</organization>
-            <organizationUrl>http://www.viadee.de</organizationUrl>
-        </developer>
-    </developers>
+		<developer>
+			<name>Christian Nockemann</name>
+			<email>christian.nockemann@viadee.de</email>
+			<organization>viadee Unternehmensberatung GmbH</organization>
+			<organizationUrl>http://www.viadee.de</organizationUrl>
+		</developer>
+	</developers>
 
 	<properties>
 		<java.version>1.6</java.version>
@@ -173,6 +173,57 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.2.1</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.9.1</version>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>1.5</version>
+					<executions>
+						<execution>
+							<id>sign-artifacts</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>sign</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<!--plugin>
+					<groupId>org.sonatype.plugins</groupId>
+					<artifactId>nexus-staging-maven-plugin</artifactId>
+					<version>1.6.7</version>
+					<extensions>true</extensions>
+					<configuration>
+						<serverId>ossrh</serverId>
+						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+						<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					</configuration>
+				</plugin-->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.3</version>
 					<configuration>
@@ -229,7 +280,7 @@
 		</pluginManagement>
 	</build>
 
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<description>This Tool provides the means to monitor the performance of Spring Batch applications without the need to manipulate the respective code basis.
 
 Through Listeners and AOP it evaluates the throughput of a monitored Job and writes the result to a simble database-schema (a file-based H2 by default).
