@@ -22,6 +22,8 @@ We will keep the database schema as stable as possible, in order to enable users
 ## Cooperation
 Feel free to add issues, questions, ideas or patches. We are looking forward to it.
 
+[![Build Status](https://travis-ci.org/viadee/springBatchPerformanceMonitoring.svg?branch=master)](https://travis-ci.org/viadee/springBatchPerformanceMonitoring)
+
 ## License (BSD4)
 All rights reserved.
 
