@@ -38,27 +38,7 @@
 		<spring.batch.version>3.0.5.RELEASE</spring.batch.version>
 
 	</properties>
-
-	<repositories>
-		<repository>
-			<id>viadeeNexus</id>
-			<name>Viadee Nexus</name>
-			<url>http://nexus.intern.viadee.de/repository/maven-public/</url>
-		</repository>
-	</repositories>
-	<distributionManagement>
-		<repository>
-			<id>viadeeNexus</id>
-			<name>Internal Releases</name>
-			<url>http://nexus.intern.viadee.de/repository/maven-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>viadeeNexus</id>
-			<name>Internal Snapshots</name>
-			<url>http://nexus.intern.viadee.de/repository/maven-snapshots/</url>
-			<uniqueVersion>false</uniqueVersion>
-		</snapshotRepository>
-	</distributionManagement>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -211,17 +191,7 @@
 						</execution>
 					</executions>
 				</plugin>
-				<!--plugin>
-					<groupId>org.sonatype.plugins</groupId>
-					<artifactId>nexus-staging-maven-plugin</artifactId>
-					<version>1.6.7</version>
-					<extensions>true</extensions>
-					<configuration>
-						<serverId>ossrh</serverId>
-						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-						<autoReleaseAfterClose>true</autoReleaseAfterClose>
-					</configuration>
-				</plugin-->
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -231,6 +201,7 @@
 						<target>${java.version}</target>
 					</configuration>
 				</plugin>
+				
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
@@ -281,20 +252,15 @@
 	</build>
 
 	<version>1.0.1-SNAPSHOT</version>
-	<description>This Tool provides the means to monitor the performance of Spring Batch applications without the need to manipulate the respective code basis.
-
+	<description>
+This Tool provides the means to monitor the performance of Spring Batch applications without the need to manipulate the respective code basis.
 Through Listeners and AOP it evaluates the throughput of a monitored Job and writes the result to a simble database-schema (a file-based H2 by default).
-
 It measures the performance of Job, Step, Chunk, Reader/Processor/Writer/Tasklet down to indivdual Items.
 
 Installation/Usage:
-
 1. Add the sbpm-jar to your classpath (maven-repository to follow).
-
 2. Add the de.viadee.spring.batch.infrastructure.Configurator.class to your Spring-Application-Context (via @Import on your Configuration)
-
 3. Run the Job
-    
 4. By default the monitoring result is written to project-folder/target/database/monitoringDB.mv.db
 </description>
 	<url>https://github.com/viadee/springBatchPerformanceMonitoring</url>
