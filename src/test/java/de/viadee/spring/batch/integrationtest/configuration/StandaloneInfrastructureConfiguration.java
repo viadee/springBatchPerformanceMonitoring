@@ -26,75 +26,65 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableBatchProcessing
 public class StandaloneInfrastructureConfiguration implements InfrastructureConfiguration {
 
-	private static Logger LOG = Logger.getLogger(StandaloneInfrastructureConfiguration.class);
+    private static Logger LOG = Logger.getLogger(StandaloneInfrastructureConfiguration.class);
 
-	@Bean
-	public JdbcTemplate jdbcTemplate() {
-		return new JdbcTemplate(dataSource());
-	}
+    @Bean
+    public JdbcTemplate jdbcTemplate() {
+        return new JdbcTemplate(dataSource());
+    }
 
-	@Bean
-	public JobRegistry jobRegistry() {
-		return new MapJobRegistry();
-	}
+    @Bean
+    public JobRegistry jobRegistry() {
+        return new MapJobRegistry();
+    }
 
-	@Bean
-	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
-		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
-		return jobRegistryBeanPostProcessor;
-	}
+    @Bean
+    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
+        final JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
+        return jobRegistryBeanPostProcessor;
+    }
 
-	@Override
-	@Bean
-	public DataSource dataSource() {
+    @Override
+    @Bean
+    public DataSource dataSource() {
 
-		SimpleDriverDataSource simpleDriverDataSource = new SimpleDriverDataSource();
-		simpleDriverDataSource.setUrl("jdbc:h2:./target/database/ExampleJobDB;MULTI_THREADED=1;DB_CLOSE_ON_EXIT=FALSE");
-		simpleDriverDataSource.setUsername("sa");
-		simpleDriverDataSource.setPassword("sasa");
-		try {
-			simpleDriverDataSource.setDriverClass((Class<? extends Driver>) Class.forName("org.h2.Driver"));
-		} catch (ClassNotFoundException e) {
-			LOG.warn(e);
-		}
-		// Initialize DB
-		DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-		dataSourceInitializer.setDataSource(simpleDriverDataSource);
-		ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-		resourceDatabasePopulator.addScript(new ClassPathResource("SQL/schema-h2.sql"));
-		resourceDatabasePopulator.addScript(new ClassPathResource("SQL/prepare-tables.sql"));
-		dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
-		dataSourceInitializer.afterPropertiesSet();
-		return simpleDriverDataSource;
-		/*
-		 * EmbeddedDatabaseBuilder embeddedDatabaseBulder = new
-		 * EmbeddedDatabaseBuilder(); return
-		 * embeddedDatabaseBulder.addScript("SQL/schema-h2.sql").addScript(
-		 * "SQL/prepare-tables.sql") .setType(EmbeddedDatabaseType.H2).build();
-		 */
-	}
+        final SimpleDriverDataSource simpleDriverDataSource = new SimpleDriverDataSource();
+        simpleDriverDataSource.setUrl("jdbc:h2:./target/database/ExampleJobDB;MULTI_THREADED=1;DB_CLOSE_ON_EXIT=FALSE");
+        simpleDriverDataSource.setUsername("sa");
+        simpleDriverDataSource.setPassword("sasa");
+        try {
+            simpleDriverDataSource.setDriverClass((Class<? extends Driver>) Class.forName("org.h2.Driver"));
+        } catch (final ClassNotFoundException e) {
+            LOG.warn(e);
+        }
+        // Initialize DB
+        final DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
+        dataSourceInitializer.setDataSource(simpleDriverDataSource);
+        final ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
+        resourceDatabasePopulator.addScript(new ClassPathResource("SQL/schema-h2.sql"));
+        resourceDatabasePopulator.addScript(new ClassPathResource("SQL/prepare-tables.sql"));
+        dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+        dataSourceInitializer.afterPropertiesSet();
+        return simpleDriverDataSource;
+    }
 
-	// This doesn't seem to set the maximum Number of Threads (see
-	// CalculateTransactionTotalPartitioningStep.java)
-	// Due to possible unknown side effects, we shall keep both Values on the
-	// same value
-	@Override
-	@Bean
-	public TaskExecutor taskExecutor() {
-		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		return taskExecutor;
-	}
+    @Override
+    @Bean
+    public TaskExecutor taskExecutor() {
+        final SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+        return taskExecutor;
+    }
 
-	@Override
-	@Bean
-	public PlatformTransactionManager platformTransactionManager() {
-		return new DataSourceTransactionManager(dataSource());
-	}
+    @Override
+    @Bean
+    public PlatformTransactionManager platformTransactionManager() {
+        return new DataSourceTransactionManager(dataSource());
+    }
 
-	@Override
-	@Bean
-	public NamedParameterJdbcTemplate template() {
-		return new NamedParameterJdbcTemplate(dataSource());
-	}
+    @Override
+    @Bean
+    public NamedParameterJdbcTemplate template() {
+        return new NamedParameterJdbcTemplate(dataSource());
+    }
 }
