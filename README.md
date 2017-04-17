@@ -12,12 +12,16 @@ It measures the performance of Job, Step, Chunk, Reader/Processor/Writer/Tasklet
 3. Run the Job
 4. By default the monitoring result is written to project-folder/target/database/monitoringDB.mv.db
 
-You can access the database with the credentials sa/sasa. It contains a perfomance data in snowflake style as well as number of prepared views for typical questions on all the detail levels mentioned above. 
+You can access the database with the credentials sa/sasa. It contains all perfomance data measured in snowflake style as well as number of prepared views for typical questions on all the detail levels mentioned above. You can see the [SQL schema in H2 syntax in the code](https://github.com/viadee/springBatchPerformanceMonitoring/blob/master/src/main/resources/SQL/schema-h2.sql).
 
 ## Commitments
 This library will remain under an open source licence indefinately.
 
-We will keep the database schema as stable as possible, in order to enable users to analyse performance logs with the toolsets of their choice.
+We follow the [semantic versioning](http://semver.org) scheme (2.0.0).
+
+In the sense of semantic versioning, the resulting database schema is the _only public API_ provided here. We will keep the database schema as stable as possible, in order to enable users to analyse performance logs with the toolsets of their choice.
+
+For the same reason, we do not use any database specific features and we minimize the assumptions made regarding Spring versions and the whole runtime environment.
 
 ## Cooperation
 Feel free to add issues, questions, ideas or patches. We are looking forward to it.
