@@ -36,13 +36,13 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 /**
- * The Monitoring-Tool stores its data in its own database. Since this needs a DataSource and a JdbcTemplate, it will
+ * The monitoring tool stores its data in its own database. Since this requires DataSource and a JdbcTemplate, it will
  * lead to problems when the monitored batch Project is using Autowire on "DataSource" or "JdbcTemplate". To prevent
  * possible errors on context creation (Autowiring identifies two possible candidates for Autowiring), both the
- * DataSource and the JdbcTemplate used by the Monitoring-Tool are encapsulated into these "Holder" classes.
+ * DataSource and the JdbcTemplate are encapsulated into these "Holder" classes.
  * 
- * Accessing the Monitoring-Database only works by these classes.
- * 
+ * This class knowingly violates the dependency injection principle by instantiating dependencies - preventing
+ * interference with the client project is more important.
  */
 public final class DataSourceHolder {
 

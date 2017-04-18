@@ -21,81 +21,60 @@
 package de.viadee.spring.batch.persistence.types;
 
 /**
- * This is the Database representation of an Item-Based Performance-Measurement.
- * It stores the information, how long an item has been active in a particular
- * action (Read / Process / Write).
+ * This is the Database representation of an Item-Based Performance-Measurement. It stores the information, how long an
+ * item has been active in a particular action (Read / Process / Write).
  * 
- * IMPORTANT: This class makes use of the "toString()" Method of the processed
- * Item in order to empower the Developer to identify the particular Item that
- * has been processed by the dataset inside the Monitoring-Database. Please do
- * use a StringBuffer rather than String concatination in the "toString()"
- * Method of your Items in order to keep the Monitoring-Overhead on a minimal
- * level!s
+ * IMPORTANT: This class makes use of the "toString()" Method of the processed Item in order to empower the Developer to
+ * identify the particular Item that has been processed by the dataset inside the Monitoring-Database. Please do use a
+ * StringBuffer rather than String concatination in the "toString()" Method of your Items in order to keep the
+ * monitoring overhead minimal.
+ * 
+ * This is an immutable class.
  *
  */
 public class SPBMItem {
 
-	private int actionID;
+    private final int actionID;
 
-	private int chunkExecutionID;
+    private final int chunkExecutionID;
 
-	private int timeInMS;
+    private final int timeInMS;
 
-	private String itemName;
+    private final String itemName;
 
-	private int error;
+    private final int error;
 
-	public SPBMItem(final int actionID, final int chunkExecutionID, final int timeInMS, final int error,
-			String itemName) {
-		super();
-		this.actionID = actionID;
-		this.chunkExecutionID = chunkExecutionID;
-		this.timeInMS = timeInMS;
-		this.error = error;
-		if (itemName.length() >= 300) {
-			itemName = itemName.substring(0, 300);
-		}
-		this.itemName = itemName;
-	}
+    public SPBMItem(final int actionID, final int chunkExecutionID, final int timeInMS, final int error,
+            String itemName) {
+        super();
+        this.actionID = actionID;
+        this.chunkExecutionID = chunkExecutionID;
+        this.timeInMS = timeInMS;
+        this.error = error;
+        if (itemName.length() >= 300) {
+            itemName = itemName.substring(0, 300);
+        }
+        this.itemName = itemName;
+    }
 
-	public String getItemName() {
-		return itemName;
-	}
+    public String getItemName() {
+        return itemName;
+    }
 
-	public void setItemName(final String itemName) {
-		this.itemName = itemName;
-	}
+    public int getActionID() {
+        return actionID;
+    }
 
-	public int getActionID() {
-		return actionID;
-	}
+    public int getChunkExecutionID() {
+        return chunkExecutionID;
+    }
 
-	public void setActionID(final int actionID) {
-		this.actionID = actionID;
-	}
+    public int getTimeInMS() {
+        return timeInMS;
+    }
 
-	public int getChunkExecutionID() {
-		return chunkExecutionID;
-	}
-
-	public void setChunkExecutionID(final int chunkExecutionID) {
-		this.chunkExecutionID = chunkExecutionID;
-	}
-
-	public int getTimeInMS() {
-		return timeInMS;
-	}
-
-	public void setTimeInMS(final int timeInMS) {
-		this.timeInMS = timeInMS;
-	}
-
-	public int isError() {
-		return error;
-	}
-
-	public void setError(final int error) {
-		this.error = error;
-	}
+    public int isError() {
+        return error;
+    }
 
 }
