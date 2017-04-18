@@ -36,21 +36,22 @@ import de.viadee.spring.batch.persistence.types.SPBMItem;
 @Repository
 public class SPBMItemDAOImpl implements SPBMItemDAO {
 
-	@Autowired
-	private JdbcTemplateHolder jdbcTemplateHolder;
+    @Autowired
+    private JdbcTemplateHolder jdbcTemplateHolder;
 
-	private final String INSERTSQL = "INSERT INTO \"Item\" (\"ActionID\",\"ChunkExecutionID\",\"ItemName\",\"TimeInMS\",\"Error\") VALUES (:actionID,:chunkExecutionID,:itemName,:timeInMS,:error);";
+    private final String INSERTSQL = "INSERT INTO \"Item\" (\"ActionID\",\"ChunkExecutionID\",\"ItemName\",\"TimeInMS\",\"Error\") VALUES (:actionID,:chunkExecutionID,:itemName,:timeInMS,:error);";
 
-	@Override
-	public void insert(final SPBMItem sPBMItem) { // TODO: Create a batch-update
-													// method
-		final Map<String, String> params = new HashMap<String, String>();
-		params.put("actionID", "" + sPBMItem.getActionID());
-		params.put("chunkExecutionID", "" + sPBMItem.getChunkExecutionID());
-		params.put("itemName", "" + sPBMItem.getItemName());
-		params.put("timeInMS", "" + sPBMItem.getTimeInMS());
-		params.put("error", "" + sPBMItem.isError());
-		jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
-	}
+    @Override
+    public void insert(final SPBMItem sPBMItem) { // TODO: Create a batch-update
+                                                  // method
+        final Map<String, String> params = new HashMap<String, String>();
+        params.put("actionID", "" + sPBMItem.getActionID());
+        params.put("chunkExecutionID", "" + sPBMItem.getChunkExecutionID());
+        params.put("itemName", "" + sPBMItem.getItemName());
+        params.put("timeInMS", "" + sPBMItem.getTimeInMS());
+        params.put("error", "" + sPBMItem.isError());
+
+        jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
+    }
 
 }

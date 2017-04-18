@@ -37,7 +37,7 @@ import de.viadee.spring.batch.persistence.types.SPBMAction;
 public class SPBMActionDAOImpl implements SPBMActionDAO {
 
     @Autowired
-    JdbcTemplateHolder jdbcTemplateHolder;
+    private JdbcTemplateHolder jdbcTemplateHolder;
 
     private final String INSERTSQL = "INSERT INTO \"Action\" (\"ActionID\",\"ActionName\",\"ActionType\",\"ActionFather\",\"ActionTime\") VALUES (:actionID,:actionName,:actionType,:actionFather,:actionTime);";
 
