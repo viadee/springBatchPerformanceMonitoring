@@ -1,80 +1,76 @@
 package de.viadee.spring.batch.integrationtest.common;
 
-import org.apache.log4j.Logger;
-
 public class Customer {
 
-	private static Logger LOG = Logger.getLogger(Customer.class);
+    private int customerID;
 
-	private int customerID;
+    private String firstName, lastName;
 
-	private String firstName, lastName;
+    private float transactionTotal;
 
-	private float transactionTotal;
+    public Customer(final int customerID, final String firstName, final String lastName) {
+        this.customerID = customerID;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.transactionTotal = 0;
+    }
 
-	public Customer(int customerID, String firstName, String lastName) {
-		this.customerID = customerID;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.transactionTotal = 0;
-	}
+    public Customer(final int customerID, final String firstName, final String lastName, final float transactionTotal) {
+        this.customerID = customerID;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.transactionTotal = transactionTotal;
+    }
 
-	public Customer(int customerID, String firstName, String lastName, float transactionTotal) {
-		this.customerID = customerID;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.transactionTotal = transactionTotal;
-	}
+    public Customer() {
+        super();
+    }
 
-	public Customer() {
-		super();
-	}
+    public int getCustomerID() {
+        return customerID;
+    }
 
-	public int getCustomerID() {
-		return customerID;
-	}
+    public void setCustomerID(final int customerID) {
+        this.customerID = customerID;
+    }
 
-	public void setCustomerID(int customerID) {
-		this.customerID = customerID;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public void setFirstName(final String firstName) {
+        this.firstName = firstName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public void setLastName(final String lastName) {
+        this.lastName = lastName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public float getTransactionTotal() {
+        return transactionTotal;
+    }
 
-	public float getTransactionTotal() {
-		return transactionTotal;
-	}
+    public void setTransactionTotal(final float transactionTotal) {
+        this.transactionTotal = transactionTotal;
+    }
 
-	public void setTransactionTotal(float transactionTotal) {
-		this.transactionTotal = transactionTotal;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder str = new StringBuilder();
-		str.append("<");
-		str.append(this.customerID);
-		str.append(">, <");
-		str.append(this.firstName);
-		str.append(">, <");
-		str.append(this.lastName);
-		str.append(">, <");
-		str.append(this.getTransactionTotal());
-		str.append(">");
-		return str.toString();
-	}
+    @Override
+    public String toString() {
+        final StringBuilder str = new StringBuilder();
+        str.append("<");
+        str.append(this.customerID);
+        str.append(">, <");
+        str.append(this.firstName);
+        str.append(">, <");
+        str.append(this.lastName);
+        str.append(">, <");
+        str.append(this.getTransactionTotal());
+        str.append(">");
+        return str.toString();
+    }
 
 }

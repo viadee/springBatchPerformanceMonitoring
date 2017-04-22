@@ -1,10 +1,6 @@
 package de.viadee.spring.batch.integrationtest.common;
 
-import org.apache.log4j.Logger;
-
 public class CustomerEnhanced extends Customer {
-
-    private static Logger LOG = Logger.getLogger(CustomerEnhanced.class);
 
     private String firstNameUpperCase, lastNameUpperCase, firstNameLowerCase, lastNameLowerCase;
 
@@ -12,7 +8,8 @@ public class CustomerEnhanced extends Customer {
         super();
     }
 
-    public CustomerEnhanced(int customerID, String firstName, String lastName, float transactionTotal) {
+    public CustomerEnhanced(final int customerID, final String firstName, final String lastName,
+            final float transactionTotal) {
         super(customerID, firstName, lastName, transactionTotal);
     }
 
@@ -20,7 +17,7 @@ public class CustomerEnhanced extends Customer {
         return firstNameUpperCase;
     }
 
-    public void setFirstNameUpperCase(String firstNameUpperCase) {
+    public void setFirstNameUpperCase(final String firstNameUpperCase) {
         this.firstNameUpperCase = firstNameUpperCase;
     }
 
@@ -28,7 +25,7 @@ public class CustomerEnhanced extends Customer {
         return lastNameUpperCase;
     }
 
-    public void setLastNameUpperCase(String lastNameUpperCase) {
+    public void setLastNameUpperCase(final String lastNameUpperCase) {
         this.lastNameUpperCase = lastNameUpperCase;
     }
 
@@ -36,7 +33,7 @@ public class CustomerEnhanced extends Customer {
         return firstNameLowerCase;
     }
 
-    public void setFirstNameLowerCase(String firstnameLowerCase) {
+    public void setFirstNameLowerCase(final String firstnameLowerCase) {
         this.firstNameLowerCase = firstnameLowerCase;
     }
 
@@ -44,7 +41,7 @@ public class CustomerEnhanced extends Customer {
         return lastNameLowerCase;
     }
 
-    public void setLastNameLowerCase(String lastNameLowerCase) {
+    public void setLastNameLowerCase(final String lastNameLowerCase) {
         this.lastNameLowerCase = lastNameLowerCase;
     }
 

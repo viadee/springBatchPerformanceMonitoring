@@ -1,16 +1,12 @@
 package de.viadee.spring.batch.integrationtest.common;
 
-import org.apache.log4j.Logger;
-
 public class Transaction {
-
-    private static Logger LOG = Logger.getLogger(Transaction.class);
 
     private int customerID;
 
     private int amount;
 
-    public Transaction(int customerID, int amount) {
+    public Transaction(final int customerID, final int amount) {
         super();
 
         this.customerID = customerID;
@@ -25,7 +21,7 @@ public class Transaction {
         return customerID;
     }
 
-    public void setCustomerID(int customerID) {
+    public void setCustomerID(final int customerID) {
         this.customerID = customerID;
     }
 
@@ -33,7 +29,7 @@ public class Transaction {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(final int amount) {
         this.amount = amount;
     }
 }
