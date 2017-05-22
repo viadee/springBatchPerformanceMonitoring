@@ -263,5 +263,5 @@ Installation/Usage:
 3. Run the Job
 4. By default the monitoring result is written to project-folder/target/database/monitoringDB.mv.db
 </description>
-	<url>https://github.com/viadee/springBatchPerformanceMonitoring</url>
+	<url>https://java.viadee.de/spring-batch-monitoring/</url>
 </project>
