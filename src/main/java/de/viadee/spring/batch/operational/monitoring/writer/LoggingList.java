@@ -41,159 +41,161 @@ import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
 import de.viadee.spring.batch.persistence.SPBMItemQueue;
 
 /**
- * This class is used to generate a LoggingList which behaves like a common List, except it replaces the ListIterator
- * with a LoggingIterator (see LoggingIterator class).
+ * This class is used to generate a LoggingList which behaves like a common
+ * List, except it replaces the ListIterator with a LoggingIterator (see
+ * LoggingIterator class).
  * 
  * The LoggingList can be used like a common List.
  * 
  * @param <T>
+ *            Type of the items in the monitored List
  */
 public class LoggingList<T> implements List<T> {
 
-    private static final Logger LOG = LoggingWrapper.getLogger(LoggingList.class);
+	private static final Logger LOG = LoggingWrapper.getLogger(LoggingList.class);
 
-    ChronoHelper chronoHelper;
+	ChronoHelper chronoHelper;
 
-    private SPBMItemQueue sPBMItemQueue;
+	private SPBMItemQueue sPBMItemQueue;
 
-    private final List<T> list;
+	private final List<T> list;
 
-    private final String hashCode;
+	private final String hashCode;
 
-    public LoggingList(final List<T> list, final String hashCode) {
+	public LoggingList(final List<T> list, final String hashCode) {
 
-        this.list = list;
-        this.hashCode = hashCode;
-    }
+		this.list = list;
+		this.hashCode = hashCode;
+	}
 
-    public void setSPBMItemQueue(final SPBMItemQueue sPBMItemQueue) {
-        this.sPBMItemQueue = sPBMItemQueue;
-    }
+	public void setSPBMItemQueue(final SPBMItemQueue sPBMItemQueue) {
+		this.sPBMItemQueue = sPBMItemQueue;
+	}
 
-    public void setChronoHelper(final ChronoHelper chronoHelper) {
-        this.chronoHelper = chronoHelper;
-    }
+	public void setChronoHelper(final ChronoHelper chronoHelper) {
+		this.chronoHelper = chronoHelper;
+	}
 
-    public List<T> getList() {
-        return list;
-    }
+	public List<T> getList() {
+		return list;
+	}
 
-    @Override
-    public boolean add(final T e) {
-        return list.add(e);
-    }
+	@Override
+	public boolean add(final T e) {
+		return list.add(e);
+	}
 
-    @Override
-    public void add(final int index, final T element) {
-        list.add(index, element);
-    }
+	@Override
+	public void add(final int index, final T element) {
+		list.add(index, element);
+	}
 
-    @Override
-    public boolean addAll(final Collection c) {
-        return list.addAll(c);
-    }
+	@Override
+	public boolean addAll(final Collection c) {
+		return list.addAll(c);
+	}
 
-    @Override
-    public boolean addAll(final int index, final Collection c) {
-        return list.addAll(index, c);
-    }
+	@Override
+	public boolean addAll(final int index, final Collection c) {
+		return list.addAll(index, c);
+	}
 
-    @Override
-    public void clear() {
-        list.clear();
-    }
+	@Override
+	public void clear() {
+		list.clear();
+	}
 
-    @Override
-    public boolean contains(final Object o) {
-        return list.contains(o);
-    }
+	@Override
+	public boolean contains(final Object o) {
+		return list.contains(o);
+	}
 
-    @Override
-    public boolean containsAll(final Collection c) {
-        return list.containsAll(c);
-    }
+	@Override
+	public boolean containsAll(final Collection c) {
+		return list.containsAll(c);
+	}
 
-    @Override
-    public T get(final int index) {
-        return list.get(index);
-    }
+	@Override
+	public T get(final int index) {
+		return list.get(index);
+	}
 
-    @Override
-    public int indexOf(final Object o) {
-        return list.indexOf(o);
-    }
+	@Override
+	public int indexOf(final Object o) {
+		return list.indexOf(o);
+	}
 
-    @Override
-    public boolean isEmpty() {
-        return list.isEmpty();
-    }
+	@Override
+	public boolean isEmpty() {
+		return list.isEmpty();
+	}
 
-    @Override
-    public Iterator iterator() {
-        final LoggingIterator<T> loggingIterator = new LoggingIterator<T>(list.iterator(), hashCode);
-        loggingIterator.setChronoHelper(chronoHelper);
-        loggingIterator.setSPBMItemQueue(sPBMItemQueue);
-        return loggingIterator;
-    }
+	@Override
+	public Iterator iterator() {
+		final LoggingIterator<T> loggingIterator = new LoggingIterator<T>(list.iterator(), hashCode);
+		loggingIterator.setChronoHelper(chronoHelper);
+		loggingIterator.setSPBMItemQueue(sPBMItemQueue);
+		return loggingIterator;
+	}
 
-    @Override
-    public int lastIndexOf(final Object o) {
-        return list.lastIndexOf(o);
-    }
+	@Override
+	public int lastIndexOf(final Object o) {
+		return list.lastIndexOf(o);
+	}
 
-    @Override
-    public ListIterator listIterator() {
-        LOG.warn("Warning - ListIterator used. This may cause unforseen behaviour");
-        return list.listIterator();
-    }
+	@Override
+	public ListIterator listIterator() {
+		LOG.warn("Warning - ListIterator used. This may cause unforseen behaviour");
+		return list.listIterator();
+	}
 
-    @Override
-    public ListIterator listIterator(final int index) {
-        return list.listIterator(index);
-    }
+	@Override
+	public ListIterator listIterator(final int index) {
+		return list.listIterator(index);
+	}
 
-    @Override
-    public boolean remove(final Object o) {
-        return list.remove(o);
-    }
+	@Override
+	public boolean remove(final Object o) {
+		return list.remove(o);
+	}
 
-    @Override
-    public T remove(final int index) {
-        return list.remove(index);
-    }
+	@Override
+	public T remove(final int index) {
+		return list.remove(index);
+	}
 
-    @Override
-    public boolean removeAll(final Collection c) {
-        return list.removeAll(c);
-    }
+	@Override
+	public boolean removeAll(final Collection c) {
+		return list.removeAll(c);
+	}
 
-    @Override
-    public boolean retainAll(final Collection c) {
-        return list.retainAll(c);
-    }
+	@Override
+	public boolean retainAll(final Collection c) {
+		return list.retainAll(c);
+	}
 
-    @Override
-    public T set(final int index, final T element) {
-        return list.set(index, element);
-    }
+	@Override
+	public T set(final int index, final T element) {
+		return list.set(index, element);
+	}
 
-    @Override
-    public int size() {
-        return list.size();
-    }
+	@Override
+	public int size() {
+		return list.size();
+	}
 
-    @Override
-    public List subList(final int fromIndex, final int toIndex) {
-        return list.subList(fromIndex, toIndex);
-    }
+	@Override
+	public List subList(final int fromIndex, final int toIndex) {
+		return list.subList(fromIndex, toIndex);
+	}
 
-    @Override
-    public Object[] toArray() {
-        return list.toArray();
-    }
+	@Override
+	public Object[] toArray() {
+		return list.toArray();
+	}
 
-    @Override
-    public Object[] toArray(final Object[] a) {
-        return list.toArray(a);
-    }
+	@Override
+	public Object[] toArray(final Object[] a) {
+		return list.toArray(a);
+	}
 }

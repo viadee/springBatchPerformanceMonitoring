@@ -41,93 +41,97 @@ import de.viadee.spring.batch.persistence.SPBMStepDAO;
 import de.viadee.spring.batch.persistence.types.SPBMJob;
 
 /**
- * This class implements the BeanPostProcessor. Each Bean initialization (regarding the Spring Batch Process to be
- * monitored) will trigger the "postProcessAfterInitialization" method below. It handles the initialization of the Job-,
- * Step-, and Chunk-Listeners and assigns them to those Spring Batch Objects.
+ * This class implements the BeanPostProcessor. Each Bean initialization
+ * (regarding the Spring Batch Process to be monitored) will trigger the
+ * "postProcessAfterInitialization" method below. It handles the initialization
+ * of the Job-, Step-, and Chunk-Listeners and assigns them to those Spring
+ * Batch Objects.
  * 
  */
 @Component
 public class PostProcessorGenericListener implements BeanPostProcessor {
 
-    // Used for creating the ID of the Step in the DB
-    private static int lastStepID = 1;
+	// Used for creating the ID of the Step in the DB
+	private static int lastStepID = 1;
 
-    // Used for creating the ID for the Job in the DB
-    private static int lastJobID = 1;
+	// Used for creating the ID for the Job in the DB
+	private static int lastJobID = 1;
 
-    @Autowired
-    JobEndQueueCleaner asyncTest;
+	@Autowired
+	JobEndQueueCleaner asyncTest;
 
-    @Autowired
-    ChronoHelper chronoHelper;
+	@Autowired
+	ChronoHelper chronoHelper;
 
-    @Autowired
-    private SPBMJobDAO sPBMJobDAO;
+	@Autowired
+	private SPBMJobDAO sPBMJobDAO;
 
-    @Autowired
-    private SPBMStepDAO sPBMStepDAO;
+	@Autowired
+	private SPBMStepDAO sPBMStepDAO;
 
-    @Autowired
-    private SPBMChunkExecutionQueue sPBMChunkExecutionQueue;
+	@Autowired
+	private SPBMChunkExecutionQueue sPBMChunkExecutionQueue;
 
-    @Autowired
-    private ActivityNotifier notificationHolder;
+	@Autowired
+	private ActivityNotifier notificationHolder;
 
-    private final Map<Object, String> invokes = new HashMap<Object, String>();
+	private final Map<Object, String> invokes = new HashMap<Object, String>();
 
-    private static final Logger LOGGER = LoggingWrapper.getLogger(PostProcessorGenericListener.class);
+	private static final Logger LOGGER = LoggingWrapper.getLogger(PostProcessorGenericListener.class);
 
-    @Override
-    public Object postProcessBeforeInitialization(final Object bean, final String beanName) {
-        return bean;
-    }
+	@Override
+	public Object postProcessBeforeInitialization(final Object bean, final String beanName) {
+		return bean;
+	}
 
-    /**
-     * Postprocess to initialize the job- and steplistener into the running the job You need to know on what abstract
-     * level you want to use the listener
-     */
-    @Override
-    public Object postProcessAfterInitialization(final Object bean, final String beanName) {
+	/**
+	 * Postprocess to initialize the job- and steplistener into the running the
+	 * job You need to know on what abstract level you want to use the listener
+	 */
+	@Override
+	public Object postProcessAfterInitialization(final Object bean, final String beanName) {
 
-        if (bean instanceof AbstractJob) {
-            LOGGER.debug("PostProcessorGenericListener noticed the initialization of an AbstractJob Bean");
-            final BatchJobListener batchJobListener = new BatchJobListener();
-            batchJobListener.setSPBMJob(new SPBMJob(lastJobID++, beanName, 0));
-            batchJobListener.setSPBMJobDAO(sPBMJobDAO);
-            batchJobListener.setChronoHelper(chronoHelper);
-            batchJobListener.setNotificationHolder(notificationHolder);
-            batchJobListener.setAsyncTest(asyncTest);
-            ((AbstractJob) bean).registerJobExecutionListener(batchJobListener);
-            invokes.put(bean, "Abstract Job " + beanName);
-            LOGGER.trace("Adding " + beanName + " to the invokes list");
-        }
-        if (bean instanceof AbstractStep) {
-            LOGGER.debug("PostProcessorGenericListener noticed the initialization of an AbstractStep Bean");
-            final BatchStepListener batchStepListener = new BatchStepListener();
-            // batchStepListener.setID(lastStepID++);
-            batchStepListener.setChronoHelper(chronoHelper);
-            batchStepListener.setSPBMStepDAO(sPBMStepDAO);
-            ((AbstractStep) bean).registerStepExecutionListener(batchStepListener);
-            invokes.put(bean, "Abstract Step " + beanName);
-            LOGGER.trace("Adding " + beanName + " to the invokes list");
-        }
-        if (bean instanceof TaskletStep) {
-            LOGGER.debug("PostProcessorGenericListener noticed the initialization of a TaskletStep Bean");
-            final BatchChunkListener batchChunkListener = new BatchChunkListener();
-            ((TaskletStep) bean).registerChunkListener(batchChunkListener);
-            batchChunkListener.setChronoHelper(chronoHelper);
-            batchChunkListener.setSPBMChunkExecutionQueue(sPBMChunkExecutionQueue);
-            invokes.put(bean, "Chunk Tasklet " + beanName);
-            LOGGER.trace("Adding " + beanName + " to the invokes list");
-        }
+		if (bean instanceof AbstractJob) {
+			LOGGER.debug("PostProcessorGenericListener noticed the initialization of an AbstractJob Bean");
+			final BatchJobListener batchJobListener = new BatchJobListener();
+			batchJobListener.setSPBMJob(new SPBMJob(lastJobID++, beanName, 0));
+			batchJobListener.setSPBMJobDAO(sPBMJobDAO);
+			batchJobListener.setChronoHelper(chronoHelper);
+			batchJobListener.setNotificationHolder(notificationHolder);
+			batchJobListener.setAsyncTest(asyncTest);
+			((AbstractJob) bean).registerJobExecutionListener(batchJobListener);
+			invokes.put(bean, "Abstract Job " + beanName);
+			LOGGER.trace("Adding " + beanName + " to the invokes list");
+		}
+		if (bean instanceof AbstractStep) {
+			LOGGER.debug("PostProcessorGenericListener noticed the initialization of an AbstractStep Bean");
+			final BatchStepListener batchStepListener = new BatchStepListener();
+			// batchStepListener.setID(lastStepID++);
+			batchStepListener.setChronoHelper(chronoHelper);
+			batchStepListener.setSPBMStepDAO(sPBMStepDAO);
+			((AbstractStep) bean).registerStepExecutionListener(batchStepListener);
+			invokes.put(bean, "Abstract Step " + beanName);
+			LOGGER.trace("Adding " + beanName + " to the invokes list");
+		}
+		if (bean instanceof TaskletStep) {
+			LOGGER.debug("PostProcessorGenericListener noticed the initialization of a TaskletStep Bean");
+			final BatchChunkListener batchChunkListener = new BatchChunkListener();
+			((TaskletStep) bean).registerChunkListener(batchChunkListener);
+			batchChunkListener.setChronoHelper(chronoHelper);
+			batchChunkListener.setSPBMChunkExecutionQueue(sPBMChunkExecutionQueue);
+			invokes.put(bean, "Chunk Tasklet " + beanName);
+			LOGGER.trace("Adding " + beanName + " to the invokes list");
+		}
 
-        return bean;
-    }
+		return bean;
+	}
 
-    /**
-     * For JUnit testing
-     */
-    public Map<Object, String> getInvokes() {
-        return this.invokes;
-    }
+	/**
+	 * For JUnit testing
+	 * 
+	 * @return information for testing purposes
+	 */
+	public Map<Object, String> getInvokes() {
+		return this.invokes;
+	}
 }

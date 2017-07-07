@@ -34,81 +34,82 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 import de.viadee.spring.batch.infrastructure.LoggingWrapper;
-import de.viadee.spring.batch.operational.chronometer.Chronometer;
 import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
+import de.viadee.spring.batch.operational.chronometer.Chronometer;
 import de.viadee.spring.batch.persistence.SPBMItemQueue;
 import de.viadee.spring.batch.persistence.types.SPBMItem;
 
 /**
- * This class represents a decorator Pattern of the LoggingIterator provided by java. It enriches the default
- * LoggingIterator by logging time-information based on the use of the "next()" and "hasNext()" method.
+ * This class represents a decorator Pattern of the LoggingIterator provided by
+ * java. It enriches the default LoggingIterator by logging time-information
+ * based on the use of the "next()" and "hasNext()" method.
  * 
  * @param <T>
- * 
+ *            Type of the items in the monitored interator
  */
 public class LoggingIterator<T> implements Iterator<T> {
 
-    private final int position = 0;
+	private final int position = 0;
 
-    ChronoHelper chronoHelper;
+	ChronoHelper chronoHelper;
 
-    private static final Logger LOG = LoggingWrapper.getLogger(LoggingIterator.class);
+	private static final Logger LOG = LoggingWrapper.getLogger(LoggingIterator.class);
 
-    private final Iterator<T> iterator;
+	private final Iterator<T> iterator;
 
-    private SPBMItemQueue sPBMItemQueue;
+	private SPBMItemQueue sPBMItemQueue;
 
-    private final String hashCode;
+	private final String hashCode;
 
-    private Chronometer iteratorChronometer = null;
+	private Chronometer iteratorChronometer = null;
 
-    public void setSPBMItemQueue(final SPBMItemQueue sPBMItemQueue) {
-        this.sPBMItemQueue = sPBMItemQueue;
-    }
+	public void setSPBMItemQueue(final SPBMItemQueue sPBMItemQueue) {
+		this.sPBMItemQueue = sPBMItemQueue;
+	}
 
-    public void setChronoHelper(final ChronoHelper chronoHelper) {
-        this.chronoHelper = chronoHelper;
-    }
+	public void setChronoHelper(final ChronoHelper chronoHelper) {
+		this.chronoHelper = chronoHelper;
+	}
 
-    public LoggingIterator(final Iterator<T> iterator, final String hashCode) {
-        this.iterator = iterator;
-        this.hashCode = hashCode;
-    }
+	public LoggingIterator(final Iterator<T> iterator, final String hashCode) {
+		this.iterator = iterator;
+		this.hashCode = hashCode;
+	}
 
-    @Override
-    public boolean hasNext() {
-        final boolean hasNext = iterator.hasNext();
-        if (!hasNext) {
-            iteratorChronometer.stop();
-            final SPBMItem sPBMItem = new SPBMItem(chronoHelper.getActiveActionID(Thread.currentThread()),
-                    chronoHelper.getBatchChunkListener().getSPBMChunkExecution(Thread.currentThread())
-                            .getChunkExecutionID(),
-                    (int) iteratorChronometer.getDuration(), 0, iteratorChronometer.getObjectName());
+	@Override
+	public boolean hasNext() {
+		final boolean hasNext = iterator.hasNext();
+		if (!hasNext) {
+			iteratorChronometer.stop();
+			final SPBMItem sPBMItem = new SPBMItem(chronoHelper.getActiveActionID(Thread.currentThread()),
+					chronoHelper.getBatchChunkListener().getSPBMChunkExecution(Thread.currentThread())
+							.getChunkExecutionID(),
+					(int) iteratorChronometer.getDuration(), 0, iteratorChronometer.getObjectName());
 
-            sPBMItemQueue.addItem(sPBMItem);
-        }
-        return hasNext;
-    }
+			sPBMItemQueue.addItem(sPBMItem);
+		}
+		return hasNext;
+	}
 
-    @Override
-    public T next() {
-        if (iteratorChronometer != null) {
-            iteratorChronometer.stop();
-            final SPBMItem sPBMItem = new SPBMItem(chronoHelper.getActiveActionID(Thread.currentThread()),
-                    chronoHelper.getBatchChunkListener().getSPBMChunkExecution(Thread.currentThread())
-                            .getChunkExecutionID(),
-                    (int) iteratorChronometer.getDuration(), 0, iteratorChronometer.getObjectName());
-            sPBMItemQueue.addItem(sPBMItem);
-        }
-        final T next = iterator.next();
-        iteratorChronometer = new Chronometer();
-        iteratorChronometer.setObjectName(next.toString());
-        iteratorChronometer.startChronometer();
-        return next;
-    }
+	@Override
+	public T next() {
+		if (iteratorChronometer != null) {
+			iteratorChronometer.stop();
+			final SPBMItem sPBMItem = new SPBMItem(chronoHelper.getActiveActionID(Thread.currentThread()),
+					chronoHelper.getBatchChunkListener().getSPBMChunkExecution(Thread.currentThread())
+							.getChunkExecutionID(),
+					(int) iteratorChronometer.getDuration(), 0, iteratorChronometer.getObjectName());
+			sPBMItemQueue.addItem(sPBMItem);
+		}
+		final T next = iterator.next();
+		iteratorChronometer = new Chronometer();
+		iteratorChronometer.setObjectName(next.toString());
+		iteratorChronometer.startChronometer();
+		return next;
+	}
 
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("remove");
-    }
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException("remove");
+	}
 }

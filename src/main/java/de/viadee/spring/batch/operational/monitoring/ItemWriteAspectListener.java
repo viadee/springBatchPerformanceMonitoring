@@ -48,67 +48,78 @@ import de.viadee.spring.batch.operational.monitoring.writer.LoggingList;
 import de.viadee.spring.batch.persistence.SPBMItemQueue;
 
 /**
- * This class uses SpringAOP to measure any ItemWriter on Item-Level. Since an ItemWriter accepts a List of Items, the
- * ".write(List<T> items)" will only be called once for each chunk. To measure each item separately, we make use of the
- * LoggingList to be able to gather performance information for each item. See LoggingList class for further
- * information.
+ * This class uses SpringAOP to measure any ItemWriter on Item-Level. Since an
+ * ItemWriter accepts a List of Items, the ".write(List items)" will only be
+ * called once for each chunk. To measure each item separately, we make use of
+ * the LoggingList to be able to gather performance information for each item.
+ * See LoggingList class for further information.
  * 
  */
 @Aspect
 @Component
 public class ItemWriteAspectListener {
 
-    @Autowired
-    private ChronoHelper chronoHelper;
+	@Autowired
+	private ChronoHelper chronoHelper;
 
-    @Autowired
-    private SPBMItemQueue sPBMItemQueue;
+	@Autowired
+	private SPBMItemQueue sPBMItemQueue;
 
-    /**
-     * Variable to hold the number of the current writer (since we cannot get its object name)
-     */
-    int currentWriterNumber;
+	/**
+	 * Variable to hold the number of the current writer (since we cannot get
+	 * its object name)
+	 */
+	int currentWriterNumber;
 
-    private static final Logger LOGGER = LoggingWrapper.getLogger(ItemWriteAspectListener.class);
+	private static final Logger LOGGER = LoggingWrapper.getLogger(ItemWriteAspectListener.class);
 
-    /**
-     * This method wraps a list passed to an itemWriter into a LoggingList which contains an individual implementation
-     * for the iterator so that item based logging inside the writer is possible.
-     */
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
-    @Around("execution(* org.springframework.batch.item.ItemWriter.write(..)) && args(items)")
-    public void getItemPerformance(final ProceedingJoinPoint jp, final List items) throws Throwable {
-        LOGGER.trace("ItemWriter Around advice has been called");
-        final ItemWriter itemWriter = (ItemWriter) jp.getTarget();
-        final String callingObjectName = (itemWriter.toString().split("\\.")[(itemWriter.toString().split("\\.").length)
-                - 1]).split("@")[0].split("@")[0];
-        chronoHelper.setActiveAction(itemWriter, 3, Thread.currentThread());
-        // "Items" als parameter sind die eigentichen Nutzdaten. Diese werden hier in unsere eigene Liste überführt.
-        // Unsere Liste hat Die Logik für die Stopwatch.
+	/**
+	 * This method wraps a list passed to an itemWriter into a LoggingList which
+	 * contains an individual implementation for the iterator so that item based
+	 * logging inside the writer is possible.
+	 * 
+	 * @param jp
+	 *            monitored ItemWriter
+	 * @param items
+	 *            monitored Items
+	 * @throws Throwable
+	 *             thrown in case of error in AroundAdvice
+	 */
+	@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+	@Around("execution(* org.springframework.batch.item.ItemWriter.write(..)) && args(items)")
+	public void getItemPerformance(final ProceedingJoinPoint jp, final List items) throws Throwable {
+		LOGGER.trace("ItemWriter Around advice has been called");
+		final ItemWriter itemWriter = (ItemWriter) jp.getTarget();
+		final String callingObjectName = (itemWriter.toString().split("\\.")[(itemWriter.toString().split("\\.").length)
+				- 1]).split("@")[0].split("@")[0];
+		chronoHelper.setActiveAction(itemWriter, 3, Thread.currentThread());
+		// "Items" als parameter sind die eigentichen Nutzdaten. Diese werden
+		// hier in unsere eigene Liste überführt.
+		// Unsere Liste hat Die Logik für die Stopwatch.
 
-        chronoHelper.getBatchChunkListener().getWriter().getOwnChronometer().setObjectName(callingObjectName);
+		chronoHelper.getBatchChunkListener().getWriter().getOwnChronometer().setObjectName(callingObjectName);
 
-        final LoggingList list = new LoggingList(items, "Writer" + itemWriter.hashCode());
-        list.setChronoHelper(chronoHelper);
-        list.setSPBMItemQueue(sPBMItemQueue);
+		final LoggingList list = new LoggingList(items, "Writer" + itemWriter.hashCode());
+		list.setChronoHelper(chronoHelper);
+		list.setSPBMItemQueue(sPBMItemQueue);
 
-        if (chronoHelper.getBatchChunkListener().getProcessor().getOwnChronometer().getIsRunning()) {
-            chronoHelper.getBatchChunkListener().getProcessor().getOwnChronometer().stop();
-        }
+		if (chronoHelper.getBatchChunkListener().getProcessor().getOwnChronometer().getIsRunning()) {
+			chronoHelper.getBatchChunkListener().getProcessor().getOwnChronometer().stop();
+		}
 
-        final Object[] params = new Object[1];
-        if (itemWriter instanceof CompositeItemWriter) {
-            params[0] = items;
-        } else {
-            params[0] = list;
-        }
+		final Object[] params = new Object[1];
+		if (itemWriter instanceof CompositeItemWriter) {
+			params[0] = items;
+		} else {
+			params[0] = list;
+		}
 
-        LOGGER.trace("ItemWriter Around advice has sucessfully set up its environment");
-        LOGGER.trace("ItemWriter Around advice is not proceeding its joinpoint");
+		LOGGER.trace("ItemWriter Around advice has sucessfully set up its environment");
+		LOGGER.trace("ItemWriter Around advice is not proceeding its joinpoint");
 
-        chronoHelper.getBatchChunkListener().getWriter().getOwnChronometer().startChronometer();
+		chronoHelper.getBatchChunkListener().getWriter().getOwnChronometer().startChronometer();
 
-        jp.proceed(params);
-        LOGGER.trace("ItemWriter Around advice proceeded and has stopped its Chronometer");
-    }
+		jp.proceed(params);
+		LOGGER.trace("ItemWriter Around advice proceeded and has stopped its Chronometer");
+	}
 }

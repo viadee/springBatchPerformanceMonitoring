@@ -39,153 +39,165 @@ import org.apache.log4j.Logger;
 import de.viadee.spring.batch.infrastructure.LoggingWrapper;
 
 /**
- * This class is used to manage Chronometer object belonging to Spring Batch Domain-Objects such as Jobs, Steps,
- * Chunk-Executions ...
+ * This class is used to manage Chronometer object belonging to Spring Batch
+ * Domain-Objects such as Jobs, Steps, Chunk-Executions ...
  * 
  */
 public class TimeLogger {
 
-    private static Map<Integer, TimeLogger> allTimeLoggers = new HashMap<Integer, TimeLogger>();
+	private static Map<Integer, TimeLogger> allTimeLoggers = new HashMap<Integer, TimeLogger>();
 
-    private ChronometerType type;
+	private ChronometerType type;
 
-    private static final String OFFSETDELIMITER = "----|";
+	private static final String OFFSETDELIMITER = "----|";
 
-    private static final Logger LOGGER = LoggingWrapper.getLogger(TimeLogger.class);
+	private static final Logger LOGGER = LoggingWrapper.getLogger(TimeLogger.class);
 
-    private final List<TimeLogger> childTimeLogger = new ArrayList<TimeLogger>();
+	private final List<TimeLogger> childTimeLogger = new ArrayList<TimeLogger>();
 
-    private Chronometer parent;
+	private Chronometer parent;
 
-    /**
-     * This list is usually only used for the item-level in Reader / Processor / Writer
-     */
-    private final List<Chronometer> childChronometer = new ArrayList<Chronometer>();
+	/**
+	 * This list is usually only used for the item-level in Reader / Processor /
+	 * Writer
+	 */
+	private final List<Chronometer> childChronometer = new ArrayList<Chronometer>();
 
-    /**
-     * This particular Chronometer measures the Runtime of the Obejct, this TimeLogger exists for.
-     */
-    private final Chronometer ownChronometer = new Chronometer();
+	/**
+	 * This particular Chronometer measures the Runtime of the Obejct, this
+	 * TimeLogger exists for.
+	 */
+	private final Chronometer ownChronometer = new Chronometer();
 
-    /**
-     * Holding reference to the last created Chronometer object. This is needed for the LoggingIterator to stop the
-     * Chronometer object of the last Item in a LoggingList.
-     */
-    private Chronometer lastCreatedChronometer;
+	/**
+	 * Holding reference to the last created Chronometer object. This is needed
+	 * for the LoggingIterator to stop the Chronometer object of the last Item
+	 * in a LoggingList.
+	 */
+	private Chronometer lastCreatedChronometer;
 
-    private String name;
+	private String name;
 
-    public TimeLogger(final ChronometerType type) {
-        this.type = type;
-    }
+	public TimeLogger(final ChronometerType type) {
+		this.type = type;
+	}
 
-    public TimeLogger() {
-        setType(ChronometerType.UNDEF);
-    }
+	public TimeLogger() {
+		setType(ChronometerType.UNDEF);
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(final String name) {
-        this.name = name;
-    }
+	public void setName(final String name) {
+		this.name = name;
+	}
 
-    public List<Chronometer> getChildChronometer() {
-        return this.childChronometer;
-    }
+	public List<Chronometer> getChildChronometer() {
+		return this.childChronometer;
+	}
 
-    // Might be used in the future for CompositeItemHandling
-    public void addChildChronometer(final Chronometer chronometer) {
-        this.lastCreatedChronometer = chronometer;
-        this.childChronometer.add(chronometer);
-    }
+	// Might be used in the future for CompositeItemHandling
+	public void addChildChronometer(final Chronometer chronometer) {
+		this.lastCreatedChronometer = chronometer;
+		this.childChronometer.add(chronometer);
+	}
 
-    // Might be used in the future for CompositeItemHandling
-    public Chronometer getParent() {
-        return this.parent;
-    }
+	// Might be used in the future for CompositeItemHandling
+	public Chronometer getParent() {
+		return this.parent;
+	}
 
-    public Chronometer getOwnChronometer() {
-        return ownChronometer;
-    }
+	public Chronometer getOwnChronometer() {
+		return ownChronometer;
+	}
 
-    public void setParent(final Chronometer parent) {
-        this.parent = parent;
-        parent.addChildTimeLogger(this);
-    }
+	public void setParent(final Chronometer parent) {
+		this.parent = parent;
+		parent.addChildTimeLogger(this);
+	}
 
-    /**
-     * Returns the TimeLogger Object for a given Object o. If no TimeLogger exists for o, a new one will be created.
-     */
-    public static TimeLogger getTimeLoggerFor(final Object o) {
-        final int hashCode = o.hashCode();
-        if (allTimeLoggers.containsKey(hashCode)) {
-            return allTimeLoggers.get(hashCode);
-        } else {
-            final TimeLogger timeLogger = new TimeLogger();
-            timeLogger.setType(ChronometerType.UNDEF);
-            allTimeLoggers.put(o.hashCode(), timeLogger);
-            return timeLogger;
-        }
-    }
+	/**
+	 * Returns the TimeLogger Object for a given Object o. If no TimeLogger
+	 * exists for o, a new one will be created.
+	 * 
+	 * @param o
+	 *            Object for which the TimeLogger will be returned
+	 * @return a {@link TimeLogger}
+	 */
+	public static TimeLogger getTimeLoggerFor(final Object o) {
+		final int hashCode = o.hashCode();
+		if (allTimeLoggers.containsKey(hashCode)) {
+			return allTimeLoggers.get(hashCode);
+		} else {
+			final TimeLogger timeLogger = new TimeLogger();
+			timeLogger.setType(ChronometerType.UNDEF);
+			allTimeLoggers.put(o.hashCode(), timeLogger);
+			return timeLogger;
+		}
+	}
 
-    public ChronometerType getType() {
-        return type;
-    }
+	public ChronometerType getType() {
+		return type;
+	}
 
-    public void setType(final ChronometerType type) {
-        this.type = type;
-    }
+	public void setType(final ChronometerType type) {
+		this.type = type;
+	}
 
-    public Chronometer getLastCreatedChronometer() {
-        return lastCreatedChronometer;
-    }
+	public Chronometer getLastCreatedChronometer() {
+		return lastCreatedChronometer;
+	}
 
-    public void addChildTimeLogger(final TimeLogger timeLogger) {
-        childTimeLogger.add(timeLogger);
-    }
+	public void addChildTimeLogger(final TimeLogger timeLogger) {
+		childTimeLogger.add(timeLogger);
+	}
 
-    public List<TimeLogger> getChildTimeLogger() {
-        return childTimeLogger;
-    }
+	public List<TimeLogger> getChildTimeLogger() {
+		return childTimeLogger;
+	}
 
-    public int getChildChronometerListSize() {
-        return childChronometer.size();
-    }
+	public int getChildChronometerListSize() {
+		return childChronometer.size();
+	}
 
-    /**
-     * Helper method to create a Chronometer object which cant be named by the time of its creation. Used by the Reader
-     * Aspect. Before an item is read, the name of the Chronometer cant be set but a Chronometer must exist in order to
-     * measure the time. No longer in use
-     */
-    public Chronometer createUnspecifiedChronometer() {
-        final Chronometer chronometer = new Chronometer();
-        chronometer.setObjectName("Unspecified");
-        addChildChronometer(chronometer);
-        return chronometer;
-    }
+	/**
+	 * Helper method to create a Chronometer object which can't be named by the
+	 * time of its creation. Used by the Reader Aspect. Before an item is read,
+	 * the name of the Chronometer cant be set but a Chronometer must exist in
+	 * order to measure the time. No longer in use
+	 * 
+	 * @return a {@link Chronometer}
+	 */
+	public Chronometer createUnspecifiedChronometer() {
+		final Chronometer chronometer = new Chronometer();
+		chronometer.setObjectName("Unspecified");
+		addChildChronometer(chronometer);
+		return chronometer;
+	}
 
-    /**
-     * Recursively Prints information of all Chronometer and TimeLogger objects that are connected to this TimeLogger
-     * object.
-     * 
-     */
+	/**
+	 * Recursively Prints information of all Chronometer and TimeLogger objects
+	 * that are connected to this TimeLogger object.
+	 * 
+	 * @param offset
+	 *            Offset-String for the Log
+	 */
+	public void printWholeList(final String offset) {
+		LOGGER.trace("Printing whole list");
+		LOGGER.info(offset + this.getName());
+		LOGGER.info(offset + this.getOwnChronometer().getObjectName() + " " + this.getOwnChronometer().getDuration()
+				+ " ms");
 
-    public void printWholeList(final String offset) {
-        LOGGER.trace("Printing whole list");
-        LOGGER.info(offset + this.getName());
-        LOGGER.info(offset + this.getOwnChronometer().getObjectName() + " " + this.getOwnChronometer().getDuration()
-                + " ms");
-
-        for (final TimeLogger timeLogger : this.ownChronometer.getChildTimeLogger()) {
-            timeLogger.printWholeList(offset + OFFSETDELIMITER);
-        }
-        for (final Chronometer chronometer : this.getChildChronometer()) {
-            LOGGER.info(offset + OFFSETDELIMITER + chronometer.getObjectName() + " \t \t" + chronometer.getDuration()
-                    + " ms (Start: " + chronometer.getStartTimeMillis() + " - End: " + chronometer.getEndTimeMillis()
-                    + ")");
-        }
-    }
+		for (final TimeLogger timeLogger : this.ownChronometer.getChildTimeLogger()) {
+			timeLogger.printWholeList(offset + OFFSETDELIMITER);
+		}
+		for (final Chronometer chronometer : this.getChildChronometer()) {
+			LOGGER.info(offset + OFFSETDELIMITER + chronometer.getObjectName() + " \t \t" + chronometer.getDuration()
+					+ " ms (Start: " + chronometer.getStartTimeMillis() + " - End: " + chronometer.getEndTimeMillis()
+					+ ")");
+		}
+	}
 
 }

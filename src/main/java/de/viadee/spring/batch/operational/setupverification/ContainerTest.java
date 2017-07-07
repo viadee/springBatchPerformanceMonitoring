@@ -63,7 +63,7 @@ import de.viadee.spring.batch.operational.monitoring.PostProcessorGenericListene
  *
  * import your.package.ApplicationConfiguration;
  * 
- * @ContextConfiguration(classes = { ApplicationConfiguration.class })
+ * (at)ContextConfiguration(classes = { ApplicationConfiguration.class })
  * 
  *                               public class ContainerTest extends
  *                               de.viadee.spring.batch.operational.
