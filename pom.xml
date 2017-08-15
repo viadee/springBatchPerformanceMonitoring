@@ -262,7 +262,7 @@
 		</pluginManagement>
 	</build>
 
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<description>This Tool provides the means to monitor the performance of Spring Batch applications without the need to manipulate the respective code basis.
 Through Listeners and AOP it evaluates the throughput of a monitored Job and writes the result to a simble database-schema (a file-based H2 by default).
 It measures the performance of Job, Step, Chunk, Reader/Processor/Writer/Tasklet down to indivdual Items.
