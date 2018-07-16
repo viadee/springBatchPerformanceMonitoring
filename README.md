@@ -37,7 +37,7 @@ Feel free to add issues, questions, ideas or patches. We are looking forward to 
 
 ## License (BSD 3-Clause License)
 
-Copyright (c) 2018, viadee IT-Unternehmensberatung GmbH
+Copyright (c) 2018, viadee IT-Unternehmensberatung AG
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
