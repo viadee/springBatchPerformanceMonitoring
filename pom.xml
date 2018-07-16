@@ -30,7 +30,7 @@
 	</distributionManagement>
 
 	<organization>
-		<name>viadee Unternehmensberatung GmbH</name>
+		<name>viadee Unternehmensberatung AG</name>
 		<url>http://www.viadee.de</url>
 	</organization>
 
@@ -38,7 +38,7 @@
 		<developer>
 			<name>Christian Nockemann</name>
 			<email>christian.nockemann@viadee.de</email>
-			<organization>viadee Unternehmensberatung GmbH</organization>
+			<organization>viadee Unternehmensberatung AG</organization>
 			<organizationUrl>http://www.viadee.de</organizationUrl>
 		</developer>
 	</developers>
@@ -226,11 +226,11 @@
 				<plugin>
 					<groupId>com.mycila</groupId>
 					<artifactId>license-maven-plugin</artifactId>
-					<version>2.3</version>
+					<version>3.0</version>
 					<configuration>
 						<header>src/main/resources/BSD3-license.txt</header>
 						<properties>
-							<owner>viadee Unternehmensberatung GmbH</owner>
+							<owner>viadee Unternehmensberatung AG</owner>
 							<email>frank.koehne@viadee.de</email>
 						</properties>
 						<excludes>
