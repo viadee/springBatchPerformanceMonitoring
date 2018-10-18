@@ -43,10 +43,10 @@ import de.viadee.spring.batch.infrastructure.ActivityNotifier;
 import de.viadee.spring.batch.infrastructure.JobEndQueueCleaner;
 import de.viadee.spring.batch.infrastructure.LoggingWrapper;
 import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
-import de.viadee.spring.batch.persistence.SPBMChunkExecutionQueue;
-import de.viadee.spring.batch.persistence.SPBMJobDAO;
-import de.viadee.spring.batch.persistence.SPBMStepDAO;
-import de.viadee.spring.batch.persistence.types.SPBMJob;
+import de.viadee.spring.batch.persistence.SBPMChunkExecutionQueue;
+import de.viadee.spring.batch.persistence.SBPMJobDAO;
+import de.viadee.spring.batch.persistence.SBPMStepDAO;
+import de.viadee.spring.batch.persistence.types.SBPMJob;
 
 /**
  * This class implements the BeanPostProcessor. Each Bean initialization
@@ -72,13 +72,13 @@ public class PostProcessorGenericListener implements BeanPostProcessor {
 	ChronoHelper chronoHelper;
 
 	@Autowired
-	private SPBMJobDAO sPBMJobDAO;
+	private SBPMJobDAO sPBMJobDAO;
 
 	@Autowired
-	private SPBMStepDAO sPBMStepDAO;
+	private SBPMStepDAO sPBMStepDAO;
 
 	@Autowired
-	private SPBMChunkExecutionQueue sPBMChunkExecutionQueue;
+	private SBPMChunkExecutionQueue sPBMChunkExecutionQueue;
 
 	@Autowired
 	private ActivityNotifier notificationHolder;
@@ -102,7 +102,7 @@ public class PostProcessorGenericListener implements BeanPostProcessor {
 		if (bean instanceof AbstractJob) {
 			LOGGER.debug("PostProcessorGenericListener noticed the initialization of an AbstractJob Bean");
 			final BatchJobListener batchJobListener = new BatchJobListener();
-			batchJobListener.setSPBMJob(new SPBMJob(lastJobID++, beanName, 0));
+			batchJobListener.setSPBMJob(new SBPMJob(lastJobID++, beanName, 0));
 			batchJobListener.setSPBMJobDAO(sPBMJobDAO);
 			batchJobListener.setChronoHelper(chronoHelper);
 			batchJobListener.setNotificationHolder(notificationHolder);

@@ -28,6 +28,8 @@
  */
 package de.viadee.spring.batch.persistence.types;
 
+import org.joda.time.Instant;
+
 /**
  * This is the Database representation of an Item-Based Performance-Measurement. It stores the information, how long an
  * item has been active in a particular action (Read / Process / Write).
@@ -40,7 +42,7 @@ package de.viadee.spring.batch.persistence.types;
  * This is an immutable class.
  *
  */
-public class SPBMItem {
+public class SBPMItem {
 
     private final int actionID;
 
@@ -50,25 +52,43 @@ public class SPBMItem {
 
     private final String itemName;
 
+    private final String itemReflection;
+    
+    private final String itemClass;
+    
+    private final long timestamp;
+    
     private final int error;
-
-    public SPBMItem(final int actionID, final int chunkExecutionID, final int timeInMS, final int error,
-            String itemName) {
+    
+    public SBPMItem(final int actionID, final int chunkExecutionID, final int timeInMS, final int error,
+            String itemName, String itemReflection, String itemClass) {
         super();
         this.actionID = actionID;
         this.chunkExecutionID = chunkExecutionID;
         this.timeInMS = timeInMS;
+        this.timestamp = Instant.now().getMillis();
         this.error = error;
-        if (itemName.length() >= 300) {
-            itemName = itemName.substring(0, 300);
+        if (itemName.length() >= 1000) {
+            itemName = itemName.substring(0, 1000);
         }
         this.itemName = itemName;
+        this.itemReflection = itemReflection;
+        this.itemClass = itemClass;
     }
 
     public String getItemName() {
         return itemName;
     }
 
+    public String getItemClass() {
+        return itemClass;
+    }
+    
+    public String getItemReflection() {
+        return itemReflection;
+    }
+
+    
     public int getActionID() {
         return actionID;
     }
@@ -81,6 +101,10 @@ public class SPBMItem {
         return timeInMS;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+    
     public int isError() {
         return error;
     }

@@ -41,8 +41,8 @@ import de.viadee.spring.batch.infrastructure.LoggingWrapper;
 import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
 import de.viadee.spring.batch.operational.chronometer.ChronometerType;
 import de.viadee.spring.batch.operational.chronometer.TimeLogger;
-import de.viadee.spring.batch.persistence.SPBMChunkExecutionQueue;
-import de.viadee.spring.batch.persistence.types.SPBMChunkExecution;
+import de.viadee.spring.batch.persistence.SBPMChunkExecutionQueue;
+import de.viadee.spring.batch.persistence.types.SBPMChunkExecution;
 
 /**
  * The BatchChunkListener is created and assigned by the BeanPostProcessor class. It takes care of all the actions
@@ -51,7 +51,7 @@ import de.viadee.spring.batch.persistence.types.SPBMChunkExecution;
  */
 public class BatchChunkListener implements ChunkListener {
 
-    private SPBMChunkExecutionQueue sPBMChunkExecutionQueue;
+    private SBPMChunkExecutionQueue sPBMChunkExecutionQueue;
 
     private ChronoHelper chronoHelper;
 
@@ -61,15 +61,15 @@ public class BatchChunkListener implements ChunkListener {
 
     private TimeLogger reader, processor, writer;
 
-    private final ConcurrentHashMap<Thread, SPBMChunkExecution> threadChunkExecution = new ConcurrentHashMap<Thread, SPBMChunkExecution>();
+    private final ConcurrentHashMap<Thread, SBPMChunkExecution> threadChunkExecution = new ConcurrentHashMap<Thread, SBPMChunkExecution>();
 
     private final Map<String, TimeAwareSPBMChunkExecution> exeMap = new ConcurrentHashMap<String, TimeAwareSPBMChunkExecution>();
 
-    public SPBMChunkExecution getSPBMChunkExecution(final Thread thread) {
+    public SBPMChunkExecution getSPBMChunkExecution(final Thread thread) {
         return this.threadChunkExecution.get(thread);
     }
 
-    public void setSPBMChunkExecutionQueue(final SPBMChunkExecutionQueue sPBMChunkExecutionQueue) {
+    public void setSPBMChunkExecutionQueue(final SBPMChunkExecutionQueue sPBMChunkExecutionQueue) {
         this.sPBMChunkExecutionQueue = sPBMChunkExecutionQueue;
     }
 
@@ -101,7 +101,7 @@ public class BatchChunkListener implements ChunkListener {
         this.writer = writer;
     }
 
-    public void setThreadChunkExecution(final Thread thread, final SPBMChunkExecution sPBMChunkExecution) {
+    public void setThreadChunkExecution(final Thread thread, final SBPMChunkExecution sPBMChunkExecution) {
         this.threadChunkExecution.put(thread, sPBMChunkExecution);
     }
 
@@ -115,7 +115,7 @@ public class BatchChunkListener implements ChunkListener {
         final int chunkExecutionNumber = context.getStepContext().getStepExecution().getCommitCount() + 1;
         final String timeLoggerName = context.getStepContext().getStepName() + " chunkCount " + chunkExecutionNumber;
         timeLogger = TimeLogger.getTimeLoggerFor(timeLoggerName);
-        final SPBMChunkExecution sPBMChunkExecution = new SPBMChunkExecution(chronoHelper.getNextBatchChunkID(),
+        final SBPMChunkExecution sPBMChunkExecution = new SBPMChunkExecution(chronoHelper.getNextBatchChunkID(),
                 chronoHelper.getBatchStepListener().getSPBMStep(Thread.currentThread()).getStepID(),
                 context.getStepContext().getStepName(), chunkExecutionNumber, 0);
         this.setThreadChunkExecution(Thread.currentThread(), sPBMChunkExecution);

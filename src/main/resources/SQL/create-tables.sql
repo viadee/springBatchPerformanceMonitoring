@@ -7,9 +7,33 @@ SET LOG 0;
 -- Disable UndoLog to get a bit more Speedup
 SET UNDO_LOG 0;
 
--- Clean the whole DB
-DROP ALL OBJECTS;
+CREATE TABLE IF NOT EXISTS "BatchRuns" (
+  "ProcessID" int(11) NOT NULL AUTO_INCREMENT,
+  "JobID" int(11) NOT NULL,
+  "StepID" int(11) NOT NULL,
+  "ActionType" int(11) NOT NULL,
+  "JobName" varchar(255) NOT NULL,
+  "StepName" varchar(255) NOT NULL,
+  "StepStart" BIGINT NOT NULL,
+  "StepEnd" BIGINT NOT NULL,
+  "ActionName" varchar(255) NOT NULL,
+  "TotalTime" int(11) NOT NULL,
+  "ProcessedItems" int(11) NOT NULL,
+  "MeanTimePerItem" int(11) NOT NULL,
+  PRIMARY KEY ("ProcessID")
+);
 
+-- Clean the whole DB (Except BatchRuns)
+-- DROP ALL OBJECTS;
+DROP VIEW "ActionTotalTime" IF EXISTS;
+DROP VIEW "ChunkExecutionByTime" IF EXISTS;
+DROP VIEW "Denormalized" IF EXISTS;
+DROP VIEW "ItemDuration" IF EXISTS;
+DROP VIEW "LongestActionPerChunkExecution" IF EXISTS;
+DROP VIEW "MeanItemTimeByProcessor" IF EXISTS;
+DROP VIEW "Overview" IF EXISTS;
+
+DROP TABLE "LOGS", "TestTable", "Job", "Step", "ChunkExecution", "Action", "StepAction", "Item", "LOGGING_EVENT", "LOGGING_EVENT_PROPERTY", "LOGGING_EVENT_EXCEPTION" IF EXISTS;
 
 -- Create Table for the plain LOG
 CREATE TABLE "LOGS"
@@ -24,10 +48,45 @@ CREATE TABLE "TestTable"
 ("TestField" INTEGER    NOT NULL,
 );
 
+-- Create Tables for Logback DbAppender
+CREATE TABLE "LOGGING_EVENT" (
+  timestmp BIGINT NOT NULL,
+  formatted_message LONGVARCHAR NOT NULL,
+  logger_name VARCHAR(256) NOT NULL,
+  level_string VARCHAR(256) NOT NULL,
+  thread_name VARCHAR(256),
+  reference_flag SMALLINT,
+  arg0 VARCHAR(256),
+  arg1 VARCHAR(256),
+  arg2 VARCHAR(256),
+  arg3 VARCHAR(256),
+  caller_filename VARCHAR(256), 
+  caller_class VARCHAR(256), 
+  caller_method VARCHAR(256), 
+  caller_line CHAR(4),
+  event_id IDENTITY NOT NULL);
+
+
+CREATE TABLE "LOGGING_EVENT_PROPERTY" (
+  event_id BIGINT NOT NULL,
+  mapped_key  VARCHAR(254) NOT NULL,
+  mapped_value LONGVARCHAR,
+  PRIMARY KEY(event_id, mapped_key),
+  FOREIGN KEY (event_id) REFERENCES "LOGGING_EVENT"(event_id));
+
+CREATE TABLE "LOGGING_EVENT_EXCEPTION" (
+  event_id BIGINT NOT NULL,
+  i SMALLINT NOT NULL,
+  trace_line VARCHAR(256) NOT NULL,
+  PRIMARY KEY(event_id, i),
+  FOREIGN KEY (event_id) REFERENCES "LOGGING_EVENT"(event_id));
+  
 -- Create Tables for persisting the logged Information
 CREATE TABLE "Job" (
   "JobID" int(11) NOT NULL,
   "JobName" varchar(255) NOT NULL,
+  "JobStart" BIGINT NOT NULL,
+  "JobEnd" BIGINT NOT NULL,
   "Duration" int(11) NOT NULL,
   "JobID2" int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY ("JobID", "JobID2")
@@ -37,6 +96,8 @@ CREATE TABLE "Step" (
   "StepID" int(11) NOT NULL AUTO_INCREMENT,
   "JobID" int(11) NOT NULL,
   "StepName" varchar(255) NOT NULL,
+  "StepStart" BIGINT NOT NULL,
+  "StepEnd" BIGINT NOT NULL,
   "StepTime" int(11) NOT NULL,
   "StepID2" int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY ("StepID", "StepName", "StepID2")
@@ -70,7 +131,10 @@ CREATE TABLE "Item" (
   "ActionID" int(11) NOT NULL,
   "ChunkExecutionID" int(11) NOT NULL,
   "TimeInMS" int(11) DEFAULT NULL,
-  "ItemName" varchar(1000) NOT NULL,
+  "Timestamp" BIGINT NOT NULL,
+  "ItemName" varchar(300) NOT NULL,
+  "ItemReflection" varchar(1000),
+  "ItemClassName" varchar(255),
   "Error" tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY ("ItemID")
 );
@@ -80,7 +144,7 @@ CREATE TABLE "Item" (
 
 -- Denormalized table for copying Data to another Tool
 CREATE VIEW "Denormalized" AS (
-SELECT "Job"."JobName", "Step"."StepName", "Step"."StepTime", "ChunkExecution"."Iteration", "Action"."ActionName", "Action"."ActionType", "Item"."ItemName", "Item"."TimeInMS" FROM "Item"
+SELECT "Job"."JobName", "Step"."StepName", "Step"."StepTime", "ChunkExecution"."Iteration", "Action"."ActionName", "Action"."ActionType", "Item"."ItemName", "Item"."ItemClassName", "Item"."Timestamp", "Item"."TimeInMS" FROM "Item"
 JOIN "Action" ON "Action"."ActionID" = "Item"."ActionID"
 JOIN "ChunkExecution" ON "ChunkExecution"."ChunkExecutionID" = "Item"."ChunkExecutionID"
 JOIN "Step" ON "Step"."StepID" = "ChunkExecution"."StepID"
@@ -131,12 +195,11 @@ ORDER BY "TotalTime" DESC;
 
 -- Show Reader / Processor / Writer Tiems for each step which has an item based processing (Won't show tasklets)
 CREATE VIEW "Overview" AS 
-SELECT "Job"."JobID", "Step"."StepID", "Action"."ActionType", "Job"."JobName" AS "Job", "Step"."StepName" AS "Step", "Action"."ActionName" AS "Action", sum("Item"."TimeInMS" ) as "Total" from "Job" 
+SELECT "Job"."JobID", "Step"."StepID", "Action"."ActionType", "Job"."JobName" AS "Job", "Step"."StepName" AS "Step", "Step"."StepStart" AS "StepStart", "Step"."StepEnd" AS "StepEnd", "Action"."ActionName" AS "Action", sum("Item"."TimeInMS" ) as "Total", count("Item"."ItemID" ) as "ProcessedItems" from "Job" 
 INNER JOIN "Step" ON "Step"."JobID" = "Job"."JobID"
 INNER JOIN "ChunkExecution" ON "ChunkExecution"."StepID" = "Step"."StepID"
 INNER JOIN "Item" ON "Item"."ChunkExecutionID" = "ChunkExecution"."ChunkExecutionID"
 INNER JOIN "Action" ON "Action"."ActionID" = "Item"."ActionID"
 GROUP BY "Step"."StepID", "Action"."ActionType", "Action"."ActionID"
-ORDER BY "JobID","StepID","ActionType"
-;
+ORDER BY "JobID","StepID","ActionType";
 

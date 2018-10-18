@@ -45,10 +45,10 @@ import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
 import de.viadee.spring.batch.operational.monitoring.BatchChunkListener;
 import de.viadee.spring.batch.operational.monitoring.BatchJobListener;
 import de.viadee.spring.batch.operational.monitoring.BatchStepListener;
-import de.viadee.spring.batch.persistence.SPBMActionDAO;
-import de.viadee.spring.batch.persistence.SPBMStepActionDAO;
-import de.viadee.spring.batch.persistence.types.SPBMAction;
-import de.viadee.spring.batch.persistence.types.SPBMStepAction;
+import de.viadee.spring.batch.persistence.SBPMActionDAO;
+import de.viadee.spring.batch.persistence.SBPMStepActionDAO;
+import de.viadee.spring.batch.persistence.types.SBPMAction;
+import de.viadee.spring.batch.persistence.types.SBPMStepAction;
 
 /**
  * This is a helper Class which ensures that the gathered
@@ -104,17 +104,17 @@ public class ChronoHelper {
 
 	private final Map<Integer, Integer> hashToID = new HashMap<Integer, Integer>();
 
-	private final ConcurrentLinkedQueue<SPBMStepAction> stepActionList = new ConcurrentLinkedQueue<SPBMStepAction>();
+	private final ConcurrentLinkedQueue<SBPMStepAction> stepActionList = new ConcurrentLinkedQueue<SBPMStepAction>();
 
 	private int lastActionID = 1;
 
 	private int batchStepLastID = 1;
 
 	@Autowired
-	private SPBMActionDAO sPBMActionDAO;
+	private SBPMActionDAO sPBMActionDAO;
 
 	@Autowired
-	private SPBMStepActionDAO sPBMStepActionDAO;
+	private SBPMStepActionDAO sPBMStepActionDAO;
 
 	@Autowired
 	private JdbcTemplateHolder jdbcTemplateHolder;
@@ -184,14 +184,14 @@ public class ChronoHelper {
 				itemActions.add(itemAction);
 				final String callingObjectName = (itemAction.toString()
 						.split("\\.")[(itemAction.toString().split("\\.").length) - 1]).split("@")[0].split("@")[0];
-				final SPBMAction sPBMItemAction = new SPBMAction(hashToID(itemAction.hashCode()), callingObjectName,
+				final SBPMAction sPBMItemAction = new SBPMAction(hashToID(itemAction.hashCode()), callingObjectName,
 						actionType, 0, 0);
 				sPBMActionDAO.insert(sPBMItemAction);
 			}
 		}
 		// Check if Reader is already connected with Step
 		boolean contained = false;
-		for (final SPBMStepAction curr : stepActionList) {
+		for (final SBPMStepAction curr : stepActionList) {
 			if (curr.getActionID() == hashToID(itemAction.hashCode())
 					&& curr.getStepID() == batchStepListener.getSPBMStep(Thread.currentThread()).getStepID()) {
 				contained = true;
@@ -199,7 +199,7 @@ public class ChronoHelper {
 		}
 		if (!contained) {
 			// Add the Connection between the step and the action
-			final SPBMStepAction sPBMStepAction = new SPBMStepAction(
+			final SBPMStepAction sPBMStepAction = new SBPMStepAction(
 					batchStepListener.getSPBMStep(Thread.currentThread()).getStepID(), hashToID(itemAction.hashCode()));
 			stepActionList.add(sPBMStepAction);
 			sPBMStepActionDAO.insert(sPBMStepAction);

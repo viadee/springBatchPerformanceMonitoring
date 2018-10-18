@@ -29,7 +29,7 @@
 package de.viadee.spring.batch.operational.monitoring;
 
 import de.viadee.spring.batch.operational.chronometer.TimeLogger;
-import de.viadee.spring.batch.persistence.types.SPBMChunkExecution;
+import de.viadee.spring.batch.persistence.types.SBPMChunkExecution;
 
 /**
  * A chunk execution that logs its time of instantiation .
@@ -37,11 +37,11 @@ import de.viadee.spring.batch.persistence.types.SPBMChunkExecution;
  */
 public class TimeAwareSPBMChunkExecution {
 
-    private final SPBMChunkExecution sPBMChunkExecution;
+    private final SBPMChunkExecution sPBMChunkExecution;
 
     private final TimeLogger timeLogger;
 
-    public SPBMChunkExecution getsPBMChunkExecution() {
+    public SBPMChunkExecution getsPBMChunkExecution() {
         return sPBMChunkExecution;
     }
 
@@ -49,7 +49,7 @@ public class TimeAwareSPBMChunkExecution {
         return timeLogger;
     }
 
-    public TimeAwareSPBMChunkExecution(final SPBMChunkExecution sPBMChunkExecution, final TimeLogger timeLogger) {
+    public TimeAwareSPBMChunkExecution(final SBPMChunkExecution sPBMChunkExecution, final TimeLogger timeLogger) {
         super();
         this.sPBMChunkExecution = sPBMChunkExecution;
         this.timeLogger = timeLogger;

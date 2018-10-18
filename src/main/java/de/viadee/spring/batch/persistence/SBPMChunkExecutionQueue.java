@@ -26,31 +26,43 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.viadee.spring.batch.persistence.types;
+package de.viadee.spring.batch.persistence;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
+
+import de.viadee.spring.batch.infrastructure.LoggingWrapper;
+import de.viadee.spring.batch.persistence.types.SBPMChunkExecution;
 
 /**
- * This is the Database representation the interconnection between a Step and an Action. This is needed to speed up
- * analytical querys (also for the provided views), since gathering this connection from the database would need to join
- * almost all tables which is impractical when a lot of items have been measured.
+ * This class holds a ThreadSafe Queue containing ChunkExecution Objects that shall be stored in the Database.
+ * 
+ * Whenever a SpbmChunkExecution Object shall be persisted into the Database, it is pushed into this List.
+ * 
+ * The DatabaseScheduledWriter takes care of emptying this list and persisting the Entrys into the Database.
+ * 
+ * See DatabaseScheduledWriter class for further Details.
  * 
  */
-public class SPBMStepAction {
+@Component
+public class SBPMChunkExecutionQueue {
 
-    private final int stepID;
+    private final Queue<SBPMChunkExecution> chunkExecutionQueue = new ConcurrentLinkedQueue<SBPMChunkExecution>();
 
-    private final int actionID;
+    private static final Logger LOG = LoggingWrapper.getLogger(SBPMChunkExecutionQueue.class);
 
-    public SPBMStepAction(final int stepID, final int actionID) {
-        this.stepID = stepID;
-        this.actionID = actionID;
+    public synchronized void addChunkExecution(final SBPMChunkExecution sPBMChunkExecution) {
+        this.chunkExecutionQueue.add(sPBMChunkExecution);
     }
 
-    public int getStepID() {
-        return stepID;
+    public SBPMChunkExecution getChunk() {
+        final SBPMChunkExecution chunkExecution = chunkExecutionQueue.poll();
+        if (chunkExecution == null) {
+            LOG.trace("EMPTY POLL - Chunk Queue is empty");
+        }
+        return chunkExecution;
     }
-
-    public int getActionID() {
-        return actionID;
-    }
-
 }

@@ -28,35 +28,16 @@
  */
 package de.viadee.spring.batch.persistence;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
-import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
-import de.viadee.spring.batch.persistence.types.SPBMJob;
+import de.viadee.spring.batch.persistence.types.SBPMJob;
 
 /**
- * DAO Object for the Job Object. See SpbmJob Class for further Details.
+ * DAO Interface for the Job Object. See SpbmJobClass for further Details.
  * 
  * 
  */
-@Repository
-public class SPBMJobDAOImpl implements SPBMJobDAO {
+public interface SBPMJobDAO {
 
-    @Autowired
-    private JdbcTemplateHolder jdbcTemplateHolder;
+    public void insert(SBPMJob job);
 
-    private final String INSERTSQL = "INSERT INTO \"Job\" (\"JobID\",\"JobName\", \"Duration\") VALUES (:jobID,:jobName,:duration);";
-
-    @Override
-    public void insert(final SPBMJob job) {
-        final Map<String, String> params = new HashMap<String, String>();
-        params.put("jobID", "" + job.getJobID());
-        params.put("jobName", job.getJobName());
-        params.put("duration", "" + job.getDuration());
-        jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
-    }
-
+    public void insertMeta(SBPMJob job);
 }

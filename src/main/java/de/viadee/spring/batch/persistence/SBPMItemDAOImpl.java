@@ -29,37 +29,58 @@
 package de.viadee.spring.batch.persistence;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
 import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
-import de.viadee.spring.batch.persistence.types.SPBMItem;
+import de.viadee.spring.batch.persistence.types.SBPMItem;
 
 /**
  * DAO for the item object. See SpbmItem class for further details.
  * 
  */
-@Repository
-public class SPBMItemDAOImpl implements SPBMItemDAO {
+//@Repository
+public class SBPMItemDAOImpl implements SBPMItemDAO {
 
-    @Autowired
+    
     private JdbcTemplateHolder jdbcTemplateHolder;
-
-    private final String INSERTSQL = "INSERT INTO \"Item\" (\"ActionID\",\"ChunkExecutionID\",\"ItemName\",\"TimeInMS\",\"Error\") VALUES (:actionID,:chunkExecutionID,:itemName,:timeInMS,:error);";
-
+    
+    private final String ITEMINSERTSQL = "INSERT INTO \"Item\" (\"ActionID\",\"ChunkExecutionID\",\"ItemName\", \"ItemClassName\", \"ItemReflection\", \"TimeInMS\",\"Timestamp\", \"Error\") VALUES (:actionID,:chunkExecutionID,:itemName,:className,:itemJson,:timeInMS,:timestamp,:error);";
+    
     @Override
-    public void insert(final SPBMItem sPBMItem) { // TODO: Create a batch-update
-                                                  // method
-        final Map<String, String> params = new HashMap<String, String>();
-        params.put("actionID", "" + sPBMItem.getActionID());
-        params.put("chunkExecutionID", "" + sPBMItem.getChunkExecutionID());
-        params.put("itemName", "" + sPBMItem.getItemName());
-        params.put("timeInMS", "" + sPBMItem.getTimeInMS());
-        params.put("error", "" + sPBMItem.isError());
-
-        jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
+    public void insert(final SBPMItem sPBMItem) { 
+        final Map<String, String> params = getParams(sPBMItem);
+        jdbcTemplateHolder.getJdbcTemplate().update(ITEMINSERTSQL, params);   
     }
 
+    @Override
+    public void insertBatch(final List<SBPMItem> itemList) {
+        final Map<String, String>[] parameters = new Map[itemList.size()];
+        Map<String, String> params;
+        int counter = 0;
+        for (final SBPMItem sPBMItem : itemList) {
+        	params = getParams(sPBMItem);
+            parameters[counter++] = params;
+        }
+        this.jdbcTemplateHolder.getJdbcTemplate().batchUpdate(ITEMINSERTSQL, parameters);
+    }
+    
+    private Map<String, String> getParams(final SBPMItem sPBMItem) {
+    	final Map<String, String> params = new HashMap<String, String>();
+    	params.put("actionID", "" + sPBMItem.getActionID());
+        params.put("chunkExecutionID", "" + sPBMItem.getChunkExecutionID());
+        params.put("itemName", "" + sPBMItem.getItemName());
+    	params.put("className", sPBMItem.getItemClass());
+    	params.put("itemJson", "" + sPBMItem.getItemReflection()); 
+        params.put("timeInMS", "" + sPBMItem.getTimeInMS());
+        params.put("timestamp", "" + sPBMItem.getTimestamp());
+        params.put("error", "" + sPBMItem.isError());
+        return params;
+    }
+
+	@Override
+	public void setJdbcTemplateHolder(JdbcTemplateHolder jdbcTemplateHolder) {
+		this.jdbcTemplateHolder = jdbcTemplateHolder;		
+	}
+    
 }

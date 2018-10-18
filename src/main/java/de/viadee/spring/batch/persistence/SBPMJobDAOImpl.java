@@ -35,27 +35,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
-import de.viadee.spring.batch.persistence.types.SPBMStepAction;
+import de.viadee.spring.batch.infrastructure.SBPMConfiguration;
+import de.viadee.spring.batch.persistence.types.SBPMJob;
 
 /**
- * DAO Object for the StepAction Object. See SpbmStepAction Class for further Details.
+ * DAO Object for the Job Object. See SpbmJob Class for further Details.
  * 
- *
+ * 
  */
 @Repository
-public class SPBMStepActionDAOImpl implements SPBMStepActionDAO {
+public class SBPMJobDAOImpl implements SBPMJobDAO {
 
-    @Autowired
-    private JdbcTemplateHolder jdbcTemplateHolder;
+	@Autowired
+	private JdbcTemplateHolder jdbcTemplateHolder;
 
-    private final String INSERTSQL = "INSERT INTO \"StepAction\" (\"StepID\", \"ActionID\") VALUES (:stepID,:actionID);";
+	@Autowired
+	private SBPMConfiguration sbpmConfig;
 
-    @Override
-    public void insert(final SPBMStepAction sPBMStepAction) {
-        final Map<String, String> params = new HashMap<String, String>();
-        params.put("stepID", "" + sPBMStepAction.getStepID());
-        params.put("actionID", "" + sPBMStepAction.getActionID());
-        jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
-    }
+	private final String INSERTSQL = "INSERT INTO \"Job\" (\"JobID\",\"JobName\",\"JobStart\",\"JobEnd\",\"Duration\") VALUES (:jobID,:jobName,:jobStart,:jobEnd,:duration);";
+
+	private final String INSERTMETASQL = "INSERT INTO \"BatchRuns\"(\"JobID\", \"StepID\", \"ActionType\", \"JobName\", \"StepName\", \"StepStart\", \"StepEnd\", \"ActionName\",  \"TotalTime\", \"ProcessedItems\", \"MeanTimePerItem\") SELECT  \"OV\".*,  (\"OV\".\"Total\"/ \"OV\".\"ProcessedItems\") AS \"MeanTimePerItem\" FROM \"Overview\" AS \"OV\" WHERE \"OV\".\"JobID\" = :jobID;";
+
+	@Override
+	public void insert(final SBPMJob job) {
+		final Map<String, String> params = new HashMap<String, String>();
+		params.put("jobID", "" + job.getJobID());
+		params.put("jobName", job.getJobName());
+		params.put("jobStart", String.valueOf(job.getJobStart()));
+		params.put("jobEnd", String.valueOf(job.getJobEnd()));
+		params.put("duration", "" + job.getDuration());
+		jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
+		if (sbpmConfig.trackAnomaly()) {
+			insertMeta(job);
+		}
+	}
+
+	@Override
+	public void insertMeta(final SBPMJob job) {
+		final Map<String, String> params = new HashMap<String, String>();
+		params.put("jobID", "" + job.getJobID());
+		jdbcTemplateHolder.getJdbcTemplate().update(INSERTMETASQL, params);
+	}
 
 }

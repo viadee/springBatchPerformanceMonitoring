@@ -28,35 +28,20 @@
  */
 package de.viadee.spring.batch.persistence;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
 import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
-import de.viadee.spring.batch.persistence.types.SPBMStep;
+import de.viadee.spring.batch.persistence.types.SBPMItem;
 
 /**
- * DAO Object for the Step Object. See SpbmStep Class for further Details.
+ * DAO Interface for the Item Object. See SpbmItem Class for further Details.
  * 
- *
  */
-@Repository
-public class SPBMStepDAOImpl implements SPBMStepDAO {
+public interface SBPMItemDAO {
 
-    @Autowired
-    private JdbcTemplateHolder jdbcTemplateHolder;
+    public void insert(SBPMItem sPBMItem);
 
-    private final String INSERTSQL = "INSERT INTO \"Step\" (\"StepID\",\"JobID\",\"StepName\",\"StepTime\") VALUES (:stepID, :jobID, :stepName, :stepTime);";
+    public void insertBatch(List<SBPMItem> itemList);
 
-    @Override
-    public void insert(final SPBMStep sPBMStep) {
-        final Map<String, String> params = new HashMap<String, String>();
-        params.put("stepID", "" + sPBMStep.getStepID());
-        params.put("jobID", "" + sPBMStep.getJobID());
-        params.put("stepName", sPBMStep.getStepName());
-        params.put("stepTime", "" + sPBMStep.getStepTime());
-        jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
-    }
+	public void setJdbcTemplateHolder(JdbcTemplateHolder jdbcTemplateHolder);
 }

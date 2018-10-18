@@ -28,41 +28,13 @@
  */
 package de.viadee.spring.batch.persistence;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
-
-import de.viadee.spring.batch.infrastructure.LoggingWrapper;
-import de.viadee.spring.batch.persistence.types.SPBMItem;
+import de.viadee.spring.batch.persistence.types.SBPMAction;
 
 /**
- * This class holds a ThreadSafe Queue containing item objects that shall be stored in the Database.
- * 
- * Whenever an SpbmItem object needs to be persisted, it is pushed into this list.
- * 
- * The DatabaseScheduledWriter takes care of emptying this list and persisting the entrys in the database.
- * 
- * See DatabaseScheduledWriter class for further Details.
- * 
+ * DAO Interface for the Action Object. See SpbmAction Class for further Details.
+ *
  */
-@Component
-public class SPBMItemQueue {
+public interface SBPMActionDAO {
 
-    private final Queue<SPBMItem> itemQueue = new ConcurrentLinkedQueue<SPBMItem>();
-
-    private static final Logger LOG = LoggingWrapper.getLogger(SPBMItemQueue.class);
-
-    public void addItem(final SPBMItem sPBMItem) {
-        this.itemQueue.add(sPBMItem);
-    }
-
-    public SPBMItem getItem() {
-        final SPBMItem item = itemQueue.poll();
-        if (item == null) {
-            LOG.trace("EMPTY POLL - Item Queue is empty");
-        }
-        return item;
-    }
+    public void insert(SBPMAction sPBMAction);
 }

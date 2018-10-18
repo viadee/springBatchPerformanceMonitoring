@@ -32,8 +32,10 @@ import org.apache.log4j.Logger;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
-import de.viadee.spring.batch.persistence.SPBMChunkExecutionQueue;
-import de.viadee.spring.batch.persistence.SPBMItemQueue;
+import de.viadee.spring.batch.persistence.SBPMChunkExecutionDAOImpl;
+import de.viadee.spring.batch.persistence.SBPMChunkExecutionQueue;
+import de.viadee.spring.batch.persistence.SBPMItemDAOImpl;
+import de.viadee.spring.batch.persistence.SBPMItemQueue;
 
 /**
  * The SchedulingHolder class is used to create an isolated TaskScheduler environment, which doesn't affect / isn't
@@ -51,7 +53,7 @@ public class SchedulingHolder {
 
     private final ThreadPoolTaskScheduler heldTaskScheduler;
 
-    public SchedulingHolder(final SPBMItemQueue sPBMItemQueue, final SPBMChunkExecutionQueue sPBMChunkExecutionQueue,
+    public SchedulingHolder(final SBPMItemQueue sPBMItemQueue, final SBPMChunkExecutionQueue sPBMChunkExecutionQueue,
             final JdbcTemplateHolder jdbcTemplateHolder, final ChronoHelper chronoHelper)
                     throws IllegalStateException, InterruptedException {
 
@@ -62,6 +64,8 @@ public class SchedulingHolder {
 
         heldTaskScheduler.afterPropertiesSet();
         final DatabaseScheduledWriter dbScheduledWriter = new DatabaseScheduledWriter();
+        dbScheduledWriter.setSPBMChunkExecutionDAO(new SBPMChunkExecutionDAOImpl());
+        dbScheduledWriter.setSPBMItemDAO(new SBPMItemDAOImpl());
         dbScheduledWriter.setSPBMItemQueue(sPBMItemQueue);
         dbScheduledWriter.setSPBMChunkExecutionQueue(sPBMChunkExecutionQueue);
         dbScheduledWriter.setJdbcTemplateHolder(jdbcTemplateHolder);

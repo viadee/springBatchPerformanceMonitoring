@@ -28,6 +28,8 @@
  */
 package de.viadee.spring.batch.operational.monitoring;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -39,10 +41,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.viadee.spring.batch.infrastructure.LoggingWrapper;
+import de.viadee.spring.batch.infrastructure.SBPMConfiguration;
 import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
 import de.viadee.spring.batch.operational.chronometer.Chronometer;
-import de.viadee.spring.batch.persistence.SPBMItemQueue;
-import de.viadee.spring.batch.persistence.types.SPBMItem;
+import de.viadee.spring.batch.persistence.SBPMItemQueue;
+import de.viadee.spring.batch.persistence.types.SBPMItem;
 
 /**
  * This class uses SpringAOP to measure any ItemReader on Item-Level.
@@ -56,7 +59,10 @@ public class ItemReadAspectListener {
 	ChronoHelper chronoHelper;
 
 	@Autowired
-	SPBMItemQueue sPBMItemQueue;
+	SBPMItemQueue sPBMItemQueue;
+
+	@Autowired
+	private SBPMConfiguration sbpmConfig;
 
 	private static final Logger LOGGER = LoggingWrapper.getLogger(ItemReadAspectListener.class);
 
@@ -81,10 +87,18 @@ public class ItemReadAspectListener {
 		itemChronometer.stop();
 		// Name the Chrono
 		if (!(readItem == null)) {
-			final SPBMItem sPBMItem = new SPBMItem(
-					chronoHelper.getActiveActionID(Thread.currentThread()), chronoHelper.getBatchChunkListener()
-							.getSPBMChunkExecution(Thread.currentThread()).getChunkExecutionID(),
-					(int) itemChronometer.getDuration(), 0, readItem.toString());
+			String itemReflection = "";
+			String itemClassName = "";
+			if (sbpmConfig.trackAnomaly()) {
+				itemClassName = readItem.getClass().getSimpleName();
+				final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(readItem,
+						ToStringStyle.JSON_STYLE);
+				itemReflection = reflectionToStringBuilder.toString();
+			}
+			final SBPMItem sPBMItem = new SBPMItem(chronoHelper.getActiveActionID(Thread.currentThread()),
+					chronoHelper.getBatchChunkListener().getSPBMChunkExecution(Thread.currentThread())
+							.getChunkExecutionID(),
+					(int) itemChronometer.getDuration(), 0, readItem.toString(), itemReflection, itemClassName);
 			sPBMItemQueue.addItem(sPBMItem);
 
 		}

@@ -48,7 +48,11 @@ public class Chronometer {
      * This variable is supposed to hold the name for the Object, the Chronometer is bound to.
      */
     private String objectName;
+    
+    private String objectReflection;
 
+    private String objectClass;
+    
     private long startTimeMillis, endTimeMillis;
 
     public List<TimeLogger> getChildTimeLogger() {
@@ -86,8 +90,24 @@ public class Chronometer {
         return objectName;
     }
 
+    public void setObjectReflection(final String objectReflection) {
+        this.objectReflection = objectReflection;
+    }
+    
+    public String getObjectReflection() {
+        return objectReflection;
+    }
+    
     public void setObjectName(final String objectName) {
         this.objectName = objectName;
+    }
+    
+    public String getObjectClass() {
+        return objectClass;
+    }
+
+    public void setObjectClass(final String objectClass) {
+        this.objectClass = objectClass;
     }
 
     public long getStartTimeMillis() {

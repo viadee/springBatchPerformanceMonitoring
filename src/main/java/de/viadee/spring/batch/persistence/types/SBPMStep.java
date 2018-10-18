@@ -26,16 +26,69 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.viadee.spring.batch.persistence;
-
-import de.viadee.spring.batch.persistence.types.SPBMJob;
+package de.viadee.spring.batch.persistence.types;
 
 /**
- * DAO Interface for the Job Object. See SpbmJobClass for further Details.
+ * This is the Database representation of a Step.
  * 
- * 
+ *
  */
-public interface SPBMJobDAO {
+public class SBPMStep {
 
-    public void insert(SPBMJob job);
+	private final int stepID;
+
+	private final int jobID;
+
+	private final String stepName;
+
+	private int stepTime;
+
+	private long stepStart;
+
+	private long stepEnd;
+
+	public SBPMStep(final int stepID, final int jobID, final String stepName, final int stepTime) {
+		super();
+		this.stepID = stepID;
+		this.jobID = jobID;
+		this.stepName = stepName;
+		this.stepTime = stepTime;
+	}
+
+	public int getStepID() {
+		return stepID;
+	}
+
+	public int getJobID() {
+		return jobID;
+	}
+
+	public String getStepName() {
+		return stepName;
+	}
+
+	public int getStepTime() {
+		return stepTime;
+	}
+
+	public void setStepTime(final int stepTime) {
+		this.stepTime = stepTime;
+	}
+
+	public long getStepStart() {
+		return stepStart;
+	}
+
+	public void setStepStart(long stepStart) {
+		this.stepStart = stepStart;
+	}
+
+	public long getStepEnd() {
+		return stepEnd;
+	}
+
+	public void setStepEnd(long stepEnd) {
+		this.stepEnd = stepEnd;
+	}
+
 }

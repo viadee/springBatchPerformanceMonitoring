@@ -28,17 +28,12 @@
  */
 package de.viadee.spring.batch.infrastructure;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Driver;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -52,94 +47,34 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
  * This class knowingly violates the dependency injection principle by instantiating dependencies - preventing
  * interference with the client project is more important.
  */
+
 public final class DataSourceHolder {
 
     private static final Logger LOG = LoggingWrapper.getLogger(DataSourceHolder.class);
 
-    private final DataSource datasource = createDataSource();
+    private final DataSource datasource;
 
-    protected String username, password, url, driver;
-
-    DataSourceHolder() {
+    SBPMConfiguration config; 
+    
+    DataSourceHolder(SBPMConfiguration config) {
         LOG.debug("DataSourceHolder buildt");
+        this.config = config;
+        this.datasource = createDataSource();
     }
 
     public DataSource getDataSource() {
         return datasource;
     }
 
-    // TODO: Fix the Exception Handling
-    // Accessing the Files was initially using direct file access. Then it was changed to using the Resource Object.
-    // The Exception handling is set to handle direct file access exceptions. It has to be changed to comply
-    // with the Resource Object. WWhat you see is a HotFixed.
-
-    /**
-     * Try to read the specified SpringBatchMonitoring.properties file. If an error occurs, use fallback defaults
-     */
-    protected void setProperties() {
-        InputStream input = null;
-        try {
-
-            final Resource resource = new ClassPathResource("SpringBatchMonitoring.properties");
-            input = resource.getInputStream();
-            setDataSourceProperties(input);
-
-        } catch (final NullPointerException e) {
-            LOG.warn(
-                    "SpringBatchMonitoring.properties file not found. Falling back to default values (file inside JAR)!");
-            LOG.warn(e);
-            try {
-                final Resource resource = new ClassPathResource("springBatchMonitoringDefault.properties");
-                input = resource.getInputStream();
-                setDataSourceProperties(input);
-            } catch (final FileNotFoundException e1) {
-                LOG.warn("SpringBatchMonitoringDefault.properties file not found.");
-                LOG.warn(e1);
-            } catch (final IOException e1) {
-                LOG.warn("Opening springBatchMonitoringDefault.properties threw an IO Exception.");
-                LOG.warn(e1);
-            } catch (final NullPointerException e1) {
-                LOG.warn(
-                        "Using the Fallback Default values (springbatchmonitoringDefault.properties) threw an NullPointerException!.");
-                LOG.warn(e1);
-            }
-
-        } catch (final IOException e) {
-            LOG.warn(
-                    "SpringBatchMonitoring.properties file is not accessible / malformed. Falling back to default values");
-            LOG.warn(e);
-            final Resource backupResource = new ClassPathResource("springBatchMonitoringDefault.properties");
-
-            try {
-                input = backupResource.getInputStream();
-                setDataSourceProperties(input);
-                input.close();
-            } catch (final IOException e1) {
-                LOG.warn("springBatchMonitoringDefault.properties file is not accessible / malformed. Exiting");
-                LOG.warn(e1);
-            }
-        }
-    }
-
-    protected void setDataSourceProperties(final InputStream input) throws IOException {
-        final Properties properties = new Properties();
-        properties.load(input);
-        username = properties.getProperty("db.username");
-        password = properties.getProperty("db.password");
-        driver = properties.getProperty("db.driver");
-        url = properties.getProperty("db.url");
-    }
-
     protected DataSource createDataSource() {
-        setProperties();
 
         LOG.trace("CreateDataSource was called");
         final SimpleDriverDataSource simpleDriverDataSource = new SimpleDriverDataSource();
-        simpleDriverDataSource.setUrl(url);
-        simpleDriverDataSource.setUsername(username);
-        simpleDriverDataSource.setPassword(password);
+        simpleDriverDataSource.setUrl(config.getUrl());
+        simpleDriverDataSource.setUsername(config.getUsername());
+        simpleDriverDataSource.setPassword(config.getPassword());
         try {
-            simpleDriverDataSource.setDriverClass((Class<? extends Driver>) Class.forName(driver));
+            simpleDriverDataSource.setDriverClass((Class<? extends Driver>) Class.forName(config.getDriver()));
         } catch (final ClassNotFoundException e) {
             LOG.warn(e);
         }
