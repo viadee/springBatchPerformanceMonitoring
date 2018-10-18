@@ -28,15 +28,34 @@
  */
 package de.viadee.spring.batch.persistence;
 
-import de.viadee.spring.batch.persistence.types.SPBMStep;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
+import de.viadee.spring.batch.persistence.types.SBPMStepAction;
 
 /**
- * DAO Interface for the Step Object. See SpbmStep Class for further Details.
+ * DAO Object for the StepAction Object. See SpbmStepAction Class for further Details.
  * 
  *
  */
-public interface SPBMStepDAO {
+@Repository
+public class SBPMStepActionDAOImpl implements SBPMStepActionDAO {
 
-    public void insert(SPBMStep sPBMStep);
+    @Autowired
+    private JdbcTemplateHolder jdbcTemplateHolder;
+
+    private final String INSERTSQL = "INSERT INTO \"StepAction\" (\"StepID\", \"ActionID\") VALUES (:stepID,:actionID);";
+
+    @Override
+    public void insert(final SBPMStepAction sPBMStepAction) {
+        final Map<String, String> params = new HashMap<String, String>();
+        params.put("stepID", "" + sPBMStepAction.getStepID());
+        params.put("actionID", "" + sPBMStepAction.getActionID());
+        jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
+    }
 
 }

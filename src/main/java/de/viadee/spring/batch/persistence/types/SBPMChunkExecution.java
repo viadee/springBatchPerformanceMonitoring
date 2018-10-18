@@ -29,46 +29,60 @@
 package de.viadee.spring.batch.persistence.types;
 
 /**
- * This is the Database representation of a Step.
+ * This is the Database representation of a ChunkExecution. Each ChunkExecution creates an own dataset inside the
+ * Database.
+ * 
+ * Example Scenario: A Step processing 40 Items having a Chunksize of 30 Items.
+ * 
+ * In this Scenario, the Monitoring-Tool will create two separate ChunkExecution Elements for the particular Step.
  * 
  *
+ * 
  */
-public class SPBMStep {
+public class SBPMChunkExecution {
+
+    private final int chunkExecutionID;
 
     private final int stepID;
 
-    private final int jobID;
-
     private final String stepName;
 
-    private int stepTime;
+    private final int iteration;
 
-    public SPBMStep(final int stepID, final int jobID, final String stepName, final int stepTime) {
+    private int chunkTime;
+
+    public SBPMChunkExecution(final int chunkExecutionID, final int stepID, final String stepName, final int iteration,
+            final int chunkTime) {
         super();
+        this.chunkExecutionID = chunkExecutionID;
         this.stepID = stepID;
-        this.jobID = jobID;
         this.stepName = stepName;
-        this.stepTime = stepTime;
+        this.iteration = iteration;
+        this.chunkTime = chunkTime;
+    }
+
+    public int getChunkExecutionID() {
+        return chunkExecutionID;
     }
 
     public int getStepID() {
         return stepID;
     }
 
-    public int getJobID() {
-        return jobID;
-    }
-
     public String getStepName() {
-        return stepName;
+        return this.stepName;
     }
 
-    public int getStepTime() {
-        return stepTime;
+    public int getIteration() {
+        return iteration;
     }
 
-    public void setStepTime(final int stepTime) {
-        this.stepTime = stepTime;
+    public int getChunkTime() {
+        return chunkTime;
+    }
+
+    public void setChunkTime(final int chunkTime) {
+        this.chunkTime = chunkTime;
     }
 
 }

@@ -28,13 +28,15 @@
  */
 package de.viadee.spring.batch.persistence;
 
-import de.viadee.spring.batch.persistence.types.SPBMItem;
+import de.viadee.spring.batch.persistence.types.SBPMStep;
 
 /**
- * DAO Interface for the Item Object. See SpbmItem Class for further Details.
+ * DAO Interface for the Step Object. See SpbmStep Class for further Details.
  * 
+ *
  */
-public interface SPBMItemDAO {
+public interface SBPMStepDAO {
 
-    public void insert(SPBMItem sPBMItem);
+    public void insert(SBPMStep sPBMStep);
+
 }

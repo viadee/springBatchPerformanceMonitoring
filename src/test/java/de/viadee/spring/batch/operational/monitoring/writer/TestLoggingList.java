@@ -47,14 +47,14 @@ import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
 import de.viadee.spring.batch.operational.chronometer.TimeLogger;
 import de.viadee.spring.batch.operational.monitoring.BatchChunkListener;
 import de.viadee.spring.batch.operational.monitoring.writer.LoggingList;
-import de.viadee.spring.batch.persistence.SPBMItemDAO;
-import de.viadee.spring.batch.persistence.types.SPBMChunkExecution;
-import de.viadee.spring.batch.persistence.types.SPBMItem;
+import de.viadee.spring.batch.persistence.SBPMItemDAO;
+import de.viadee.spring.batch.persistence.types.SBPMChunkExecution;
+import de.viadee.spring.batch.persistence.types.SBPMItem;
 
 public class TestLoggingList {
 
     @Autowired
-    SPBMItemDAO sPBMItemDAO;
+    SBPMItemDAO sPBMItemDAO;
 
     @Test
     public void listSizeTest() {
@@ -148,12 +148,12 @@ public class TestLoggingList {
         Mockito.when(batchChunkListener.getWriter()).thenReturn(timeLogger);
         final LoggingList<String> loggingList = new LoggingList<String>(new ArrayList<String>(), "Bezeichnung");
         loggingList.setChronoHelper(chronoHelper);
-        final SPBMItemDAO sPBMItemDAO = Mockito.mock(SPBMItemDAO.class);
+        final SBPMItemDAO sPBMItemDAO = Mockito.mock(SBPMItemDAO.class);
         // Mockito.when(sPBMItemDAO.insert(null)).thenReturn(true);
         // TODO: Nächste zeile ist auskommentiert um compilen zu können
         // loggingList.setSPBMItemDAO(sPBMItemDAO);
         Mockito.when(chronoHelper.getActiveActionID()).thenReturn(0);
-        final SPBMChunkExecution sPBMChunkExecution = Mockito.mock(SPBMChunkExecution.class);
+        final SBPMChunkExecution sPBMChunkExecution = Mockito.mock(SBPMChunkExecution.class);
         Mockito.when(sPBMChunkExecution.getChunkExecutionID()).thenReturn(1);
         Mockito.when(batchChunkListener.getSPBMChunkExecution(Thread.currentThread())).thenReturn(sPBMChunkExecution);
         Mockito.when(
@@ -173,7 +173,7 @@ public class TestLoggingList {
         // Then
         // Assume there are Time Measure Objects
         System.out.println(timeLogger.getChildChronometerListSize());
-        Mockito.verify(sPBMItemDAO, Mockito.times(2)).insert(Mockito.any(SPBMItem.class));
+        Mockito.verify(sPBMItemDAO, Mockito.times(2)).insert(Mockito.any(SBPMItem.class));
     }
 
     // MultipleIterationIsLoggedAdequately
@@ -190,12 +190,12 @@ public class TestLoggingList {
         Mockito.when(batchChunkListener.getWriter()).thenReturn(timeLogger);
         final LoggingList<String> loggingList = new LoggingList<String>(new ArrayList<String>(), "Bezeichnung");
         loggingList.setChronoHelper(chronoHelper);
-        final SPBMItemDAO sPBMItemDAO = Mockito.mock(SPBMItemDAO.class);
+        final SBPMItemDAO sPBMItemDAO = Mockito.mock(SBPMItemDAO.class);
         // Mockito.when(sPBMItemDAO.insert(null)).thenReturn(true);
         // TODO: Nächste zeile ist auskommentiert um compilen zu können
         // loggingList.setSPBMItemDAO(sPBMItemDAO);
         Mockito.when(chronoHelper.getActiveActionID()).thenReturn(0);
-        final SPBMChunkExecution sPBMChunkExecution = Mockito.mock(SPBMChunkExecution.class);
+        final SBPMChunkExecution sPBMChunkExecution = Mockito.mock(SBPMChunkExecution.class);
         Mockito.when(sPBMChunkExecution.getChunkExecutionID()).thenReturn(1);
         Mockito.when(batchChunkListener.getSPBMChunkExecution(Thread.currentThread())).thenReturn(sPBMChunkExecution);
         Mockito.when(
@@ -218,7 +218,7 @@ public class TestLoggingList {
         // Then
         // Assume there are Time Measure Objects
         System.out.println(timeLogger.getChildChronometerListSize());
-        Mockito.verify(sPBMItemDAO, Mockito.times(4)).insert(Mockito.any(SPBMItem.class));
+        Mockito.verify(sPBMItemDAO, Mockito.times(4)).insert(Mockito.any(SBPMItem.class));
 
     }
 

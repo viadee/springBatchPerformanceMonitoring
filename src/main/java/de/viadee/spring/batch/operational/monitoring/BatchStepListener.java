@@ -34,6 +34,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.joda.time.Instant;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -43,8 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
 import de.viadee.spring.batch.infrastructure.LoggingWrapper;
 import de.viadee.spring.batch.operational.chronometer.ChronoHelper;
 import de.viadee.spring.batch.operational.chronometer.TimeLogger;
-import de.viadee.spring.batch.persistence.SPBMStepDAO;
-import de.viadee.spring.batch.persistence.types.SPBMStep;
+import de.viadee.spring.batch.persistence.SBPMStepDAO;
+import de.viadee.spring.batch.persistence.types.SBPMStep;
 
 /**
  * The BatchStepListener is created and assigned by the BeanPostProcessor class. It takes care of all the actions
@@ -60,17 +61,17 @@ public class BatchStepListener implements StepExecutionListener {
 
     private final Map<StepExecution, Object> exeMap = new ConcurrentHashMap<StepExecution, Object>();
 
-    private final ConcurrentHashMap<Thread, SPBMStep> threadSPBMStep = new ConcurrentHashMap<Thread, SPBMStep>();
+    private final ConcurrentHashMap<Thread, SBPMStep> threadSPBMStep = new ConcurrentHashMap<Thread, SBPMStep>();
 
-    private SPBMStep sPBMStep;
+    private SBPMStep sPBMStep;
 
-    private SPBMStepDAO sPBMStepDAO;
+    private SBPMStepDAO sPBMStepDAO;
 
-    public SPBMStep getSPBMStep(final Thread thread) {
+    public SBPMStep getSPBMStep(final Thread thread) {
         return this.threadSPBMStep.get(thread);
     }
 
-    public void setSPBMStepDAO(final SPBMStepDAO sPBMStepDAO) {
+    public void setSPBMStepDAO(final SBPMStepDAO sPBMStepDAO) {
         this.sPBMStepDAO = sPBMStepDAO;
     }
 
@@ -85,12 +86,13 @@ public class BatchStepListener implements StepExecutionListener {
     @Override
     public synchronized void beforeStep(final StepExecution stepExecution) {
         final String stepName = stepExecution.getStepName();
-        sPBMStep = new SPBMStep(chronoHelper.getNextBatchStepID(),
+        sPBMStep = new SBPMStep(chronoHelper.getNextBatchStepID(),
                 chronoHelper.getBatchJobListener().getSPBMJob().getJobID(), stepName, 0);
+        sPBMStep.setStepStart(Instant.now().getMillis());
         final TimeLogger tempLogger = new TimeLogger();
         tempLogger.setName(stepName);
         tempLogger.getOwnChronometer().setObjectName(stepName);
-        final Map<SPBMStep, TimeLogger> tempMap = new HashMap<SPBMStep, TimeLogger>();
+        final Map<SBPMStep, TimeLogger> tempMap = new HashMap<SBPMStep, TimeLogger>();
         tempMap.put(sPBMStep, tempLogger);
         threadSPBMStep.put(Thread.currentThread(), sPBMStep);
         exeMap.put(stepExecution, tempMap);
@@ -108,10 +110,11 @@ public class BatchStepListener implements StepExecutionListener {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public ExitStatus afterStep(final StepExecution stepExecution) {
 
-        final Map<SPBMStep, TimeLogger> lowerMap = (Map<SPBMStep, TimeLogger>) exeMap.get(stepExecution);
-        for (final Entry<SPBMStep, TimeLogger> current : lowerMap.entrySet()) {
+        final Map<SBPMStep, TimeLogger> lowerMap = (Map<SBPMStep, TimeLogger>) exeMap.get(stepExecution);
+        for (final Entry<SBPMStep, TimeLogger> current : lowerMap.entrySet()) {
             current.getValue().getOwnChronometer().stop();
             current.getKey().setStepTime((int) current.getValue().getOwnChronometer().getDuration());
+            current.getKey().setStepEnd(Instant.now().getMillis());
             sPBMStepDAO.insert(current.getKey());
         }
 

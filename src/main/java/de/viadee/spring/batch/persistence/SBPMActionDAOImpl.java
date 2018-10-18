@@ -28,15 +28,35 @@
  */
 package de.viadee.spring.batch.persistence;
 
-import de.viadee.spring.batch.persistence.types.SPBMStepAction;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
+import de.viadee.spring.batch.persistence.types.SBPMAction;
 
 /**
- * DAO Interface for the StepAction Object. See SpbmStepAction Class for further Details.
- * 
+ * DAO for the action object. See SpbmAction class for further details.
  * 
  */
-public interface SPBMStepActionDAO {
+@Repository
+public class SBPMActionDAOImpl implements SBPMActionDAO {
 
-    public void insert(SPBMStepAction sPBMStepAction);
+    @Autowired
+    private JdbcTemplateHolder jdbcTemplateHolder;
 
+    private final String INSERTSQL = "INSERT INTO \"Action\" (\"ActionID\",\"ActionName\",\"ActionType\",\"ActionFather\",\"ActionTime\") VALUES (:actionID,:actionName,:actionType,:actionFather,:actionTime);";
+
+    @Override
+    public void insert(final SBPMAction sPBMAction) {
+        final Map<String, String> params = new HashMap<String, String>();
+        params.put("actionID", "" + sPBMAction.getActionID());
+        params.put("actionName", sPBMAction.getActionName());
+        params.put("actionType", "" + sPBMAction.getActionType());
+        params.put("actionFather", "" + sPBMAction.getActionFather());
+        params.put("actionTime", "" + sPBMAction.getActionTime());
+        jdbcTemplateHolder.getJdbcTemplate().update(INSERTSQL, params);
+    }
 }

@@ -26,63 +26,23 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.viadee.spring.batch.persistence.types;
+package de.viadee.spring.batch.persistence;
+
+import java.util.List;
+
+import de.viadee.spring.batch.infrastructure.JdbcTemplateHolder;
+import de.viadee.spring.batch.persistence.types.SBPMChunkExecution;
 
 /**
- * This is the Database representation of a ChunkExecution. Each ChunkExecution creates an own dataset inside the
- * Database.
- * 
- * Example Scenario: A Step processing 40 Items having a Chunksize of 30 Items.
- * 
- * In this Scenario, the Monitoring-Tool will create two separate ChunkExecution Elements for the particular Step.
- * 
- *
+ * DAO Interface for the ChunkExecution Object. See SpbmChunkExecution Class for further Details.
  * 
  */
-public class SPBMChunkExecution {
+public interface SBPMChunkExecutionDAO {
 
-    private final int chunkExecutionID;
+    public void insert(SBPMChunkExecution sPBMChunkExecution);
 
-    private final int stepID;
-
-    private final String stepName;
-
-    private final int iteration;
-
-    private int chunkTime;
-
-    public SPBMChunkExecution(final int chunkExecutionID, final int stepID, final String stepName, final int iteration,
-            final int chunkTime) {
-        super();
-        this.chunkExecutionID = chunkExecutionID;
-        this.stepID = stepID;
-        this.stepName = stepName;
-        this.iteration = iteration;
-        this.chunkTime = chunkTime;
-    }
-
-    public int getChunkExecutionID() {
-        return chunkExecutionID;
-    }
-
-    public int getStepID() {
-        return stepID;
-    }
-
-    public String getStepName() {
-        return this.stepName;
-    }
-
-    public int getIteration() {
-        return iteration;
-    }
-
-    public int getChunkTime() {
-        return chunkTime;
-    }
-
-    public void setChunkTime(final int chunkTime) {
-        this.chunkTime = chunkTime;
-    }
-
+    public void insertBatch(List<SBPMChunkExecution> chunkExecutionList);
+    
+    public void setJdbcTemplateHolder(JdbcTemplateHolder jdbcTemplateHolder);
+    
 }
